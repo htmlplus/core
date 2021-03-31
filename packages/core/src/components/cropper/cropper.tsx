@@ -11,7 +11,7 @@ import {
   CropperResponsive,
   CropperView,
   CropperViewport,
-  CropperViewportMode,
+  CropperViewportShape,
   CropperZoomable,
   CropperZoomData,
 } from './cropper.types';
@@ -19,7 +19,7 @@ import {
 /**
  * TODO https://foliotek.github.io/Croppie/
  * @development
- * @examples default
+ * @examples default, aspect-ratio, backdrop, background, guides, indicator, mode, viewport, viewport-shape
  */
 @Component({
   tag: 'plus-cropper',
@@ -45,18 +45,6 @@ export class Cropper {
    */
   @Prop()
   background?: boolean;
-
-  /**
-   * The minimum height of the canvas (image wrapper).
-   */
-  // @Prop()
-  canvasMinHeight?: number;
-
-  /**
-   * The minimum width of the canvas (image wrapper).
-   */
-  // @Prop()
-  canvasMinWidth?: number;
 
   /**
    * TODO
@@ -87,18 +75,27 @@ export class Cropper {
 
   /**
    * TODO
+   * @value main - TODO
+   * @value edge - TODO
+   * @value both - TODO
    */
   @Prop()
   resizer?: CropperResizer = 'both';
 
   /**
    * TODO
+   * @value square - TODO
+   * @value circle - TODO
+   * @value line   - TODO
    */
   @Prop()
-  resizerShape?: CropperResizerShape = 'rect';
+  resizerShape?: CropperResizerShape = 'square';
 
   /**
    * Re-render the cropper when resizing the window.
+   * @value false - TODO
+   * @value true  - TODO
+   * @value reset - TODO
    */
   @Prop()
   responsive?: CropperResponsive = 'reset';
@@ -135,27 +132,22 @@ export class Cropper {
 
   /**
    * TODO
+   * @value static    - TODO
+   * @value movable   - TODO
+   * @value resizable - TODO
+   * @value both      - TODO
    */
   @Prop()
-  viewport?: CropperViewport = 'rect';
+  viewport?: CropperViewport = 'static';
 
   /**
    * TODO
+   * @value rectangle - TODO
+   * @value square    - TODO
+   * @value circle    - TODO
    */
   @Prop()
-  viewportMode?: CropperViewportMode = 'static';
-
-  /**
-   * The minimum height of the viewport. This size is relative to the page, not the image.
-   */
-  // @Prop()
-  viewportMinHeight?: number;
-
-  /**
-   * The minimum width of the viewport. This size is relative to the page, not the image.
-   */
-  // @Prop()
-  viewportMinWidth?: number;
+  viewportShape?: CropperViewportShape = 'rectangle';
 
   /**
    * Enable to zoom the image.
@@ -201,83 +193,17 @@ export class Cropper {
   })
   plusZoom!: EventEmitter<CropperZoomData>;
 
-  /**
-   * Move the canvas (image wrapper) with relative offsets.
-   * @param offsetX - Moving size (px) in the `horizontal` direction.
-   * @param offsetY - Moving size (px) in the `vertical` direction.
-   */
-  @Method()
-  move(offsetX?: number, offsetY?: number): Promise<void> {
-    this.instance?.move(offsetX ?? null, offsetY ?? null);
-    return Promise.resolve();
-  }
-
-  /**
-   * Move the canvas (image wrapper) to an absolute point.
-   * @param x - The `left` value of the canvas.
-   * @param y - The `top` value of the canvas.
-   */
-  @Method()
-  moveTo(x?: number, y?: number): Promise<void> {
-    this.instance?.moveTo(x ?? null, y ?? null);
-    return Promise.resolve();
-  }
-
-  /**
-   * The method creates a Blob object representing the image contained in the canvas; this file 
-   * may be cached on the disk or stored in memory at the discretion of the user agent. If type 
-   * is not specified, the image type is image/png. The created image is in a resolution of 96dpi.
-   * @param type    - A string indicating the image format. The default type is `image/png`.
-   * @param quality - A Number between `0` and `1` indicating image quality if the requested 
-   *                  type is `image/jpeg` or `image/webp`. If this argument is anything else, 
-   *                  the default values `0.92` and `0.80` are used for `image/jpeg` and 
-   *                  `image/webp` respectively. Other arguments are ignored.
-   * @returns A callback function with the resulting Blob object as a single argument.
-   */
-  @Method()
-  toBlob(type?: string, quality?: number): Promise<Blob> {
-    return new Promise((resolve) => {
-      this.instance
-        .getCroppedCanvas()
-        .toBlob(
-          (blob) => resolve(blob),
-          type,
-          quality
-        )
-    })
-  }
-
-  // no need
-  // getData(rounded?: boolean): Cropper.Data;
-  // setData(data: Cropper.SetDataOptions): Cropper;
-
-  // backlog
-  // clear(): Cropper;
-  // crop(): Cropper;
-  // destroy(): Cropper;
-  // disable(): Cropper;
-  // enable(): Cropper;
-  // getCanvasData(): Cropper.CanvasData;
-  // getContainerData(): Cropper.ContainerData;
-  // getCropBoxData(): Cropper.CropBoxData;
-  // getCroppedCanvas(options?: Cropper.GetCroppedCanvasOptions): HTMLCanvasElement;
-  // getImageData(): Cropper.ImageData;
-  // replace(url: string, onlyColorChanged?: boolean): Cropper;
-  // reset(): Cropper;
-  // rotate(degree: number): Cropper;
-  // rotateTo(degree: number): Cropper;
-  // scale(scaleX: number, scaleY?: number): Cropper;
-  // scaleX(scaleX: number): Cropper;
-  // scaleY(scaleY: number): Cropper;
-  // setAspectRatio(aspectRatio: number): Cropper;
-  // setCanvasData(data: Cropper.SetCanvasDataOptions): Cropper;
-  // setCropBoxData(data: Cropper.SetCropBoxDataOptions): Cropper;
-  // setDragMode(dragMode: Cropper.DragMode): Cropper;
-  // zoom(ratio: number): Cropper;
-  // zoomTo(ratio: number, pivot?: { x: number; y: number }): Cropper;
-
   @GlobalConfig('crop', {
-    // TODO
+    backdrop: true,
+    mode: 'move',
+    resizer: 'both',
+    resizerShape: 'square',
+    responsive: 'reset',
+    view: 'cover',
+    viewport: 'static',
+    viewportShape: 'rectangle',
+    zoomable: true,
+    zoomRatio: 0.1,
   })
   config?;
 
@@ -295,7 +221,7 @@ export class Cropper {
     return Utils.classes(
       'wrapper',
       {
-        viewport: this.viewport,
+        viewportShape: this.viewportShape,
         resizer: this.resizer,
         resizerShape: this.resizerShape
       }
@@ -306,7 +232,7 @@ export class Cropper {
 
     const aspectRatio = (() => {
 
-      if (typeof this.aspectRatio === 'undefined') return;
+      if (typeof this.aspectRatio === 'undefined') return NaN;
 
       if (typeof this.aspectRatio === 'string') {
 
@@ -317,7 +243,7 @@ export class Cropper {
         return value;
       }
 
-      return this.aspectRatio;
+      return this.aspectRatio ?? NaN;
     })();
 
     const responsive = (() => {
@@ -339,29 +265,33 @@ export class Cropper {
     })();
 
     return {
-      aspectRatio: Utils.toBoolean(this.viewport === 'round') ? 1 : aspectRatio,
-      // autoCrop: true,
-      // autoCropArea: this.autoCropArea,
+      // TODO
+      // autoCrop        : true,
+      // autoCropArea    : this.autoCropArea,
+      // checkCrossOrigin: true,
+      // checkOrientation: true,
+      // minCanvasWidth  : this.canvasMinWidth,
+      // minCanvasHeight : this.canvasMinHeight,
+      // minCropBoxWidth : this.viewportMinWidth,
+      // minCropBoxHeight: this.viewportMinHeight,
+      // preview         : HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | string,
+      // cropstart       : (e) => console.log('cropstart', e),
+      // cropmove        : (e) => console.log('cropmove', e),
+      // cropend         : (e) => console.log('cropend', e),
+      aspectRatio: this.viewportShape === 'rectangle' ? aspectRatio : 1,
       background: Utils.toBoolean(this.background),
       center: Utils.toBoolean(this.indicator),
-      // checkCrossOrigin: false, // TODO
-      // checkOrientation: true,
-      cropBoxMovable: this.viewportMode === 'movable' || this.viewportMode === 'both',// TODO
-      cropBoxResizable: this.viewportMode === 'resizable' || this.viewportMode === 'both',// TODO
+      cropBoxMovable: this.viewport === 'movable' || this.viewport === 'both',
+      cropBoxResizable: this.viewport === 'resizable' || this.viewport === 'both',
       data: this.value,
       dragMode: this.mode,
       guides: Utils.toBoolean(this.guides),
       highlight: false,
       initialAspectRatio: NaN,
-      minCanvasWidth: this.canvasMinWidth,
-      minCanvasHeight: this.canvasMinHeight,
-      minCropBoxWidth: this.viewportMinWidth,
-      minCropBoxHeight: this.viewportMinHeight,
       minContainerWidth: 0,
       minContainerHeight: 0,
       modal: Utils.toBoolean(this.backdrop),
       movable: true, // TODO: make auto
-      // preview: HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | string,
       responsive: !!responsive,
       restore: responsive === 'reset',
       rotatable: true,
@@ -372,13 +302,149 @@ export class Cropper {
       zoomable: !!zoomable,
       zoomOnTouch: zoomable === true || zoomable === 'touch',
       zoomOnWheel: zoomable === true || zoomable === 'wheel',
-      crop: this.onCrop,
+      cropend: this.onCrop,
       ready: this.onReady,
-      // cropstart: (e) => console.log('cropstart', e),
-      // cropmove: (e) => console.log('cropmove', e),
-      // cropend: (e) => console.log('cropend', e),
       zoom: this.onZoom
     }
+  }
+
+  /**
+   * External Methods
+   */
+
+  /**
+   * Flip horizontal.
+   */
+  @Method()
+  flipX(): Promise<void> {
+    this.instance?.scale(-1, 1);
+    return Promise.resolve();
+  }
+
+  /**
+   * Flip vertical.
+   */
+  @Method()
+  flipY(): Promise<void> {
+    this.instance?.scale(1, -1);
+    return Promise.resolve();
+  }
+
+  /**
+   * Move the canvas (image wrapper) with relative offsets.
+   * @param offsetX - Moving size (px) in the `horizontal` direction. Use `null` to ignore this.
+   * @param offsetY - Moving size (px) in the `vertical` direction. Use `null` to ignore this.
+   */
+  @Method()
+  move(offsetX?: number, offsetY?: number): Promise<void> {
+    this.instance?.move(offsetX ?? null, offsetY ?? null);
+    return Promise.resolve();
+  }
+
+  /**
+   * Move the canvas (image wrapper) to an absolute point.
+   * @param x - The `left` value of the canvas. Use `null` to ignore this.
+   * @param y - The `top` value of the canvas. Use `null` to ignore this.
+   */
+  @Method()
+  moveTo(x?: number, y?: number): Promise<void> {
+    this.instance?.moveTo(x ?? null, y ?? null);
+    return Promise.resolve();
+  }
+
+  /**
+   * Reset the image and viewport to their initial states.
+   */
+  @Method()
+  reset(): Promise<void> {
+    this.instance?.reset();
+    return Promise.resolve();
+  }
+
+  /**
+   * Rotate the image with a relative degree.
+   * @param degree - TODO
+   */
+  @Method()
+  rotate(degree: number): Promise<void> {
+    this.instance?.rotate(degree);
+    return Promise.resolve();
+  }
+
+  /**
+   * Rotate the image to an absolute degree.
+   * @param degree - TODO
+   */
+  @Method()
+  rotateTo(degree: number): Promise<void> {
+    this.instance?.rotateTo(degree);
+    return Promise.resolve();
+  }
+
+  /**
+   * TODO
+   */
+  @Method()
+  toBlob(): Promise<Blob> {
+    return new Promise((resolve) => {
+      this.instance
+        .getCroppedCanvas()
+        .toBlob((blob) => resolve(blob))
+    })
+  }
+
+  /**
+   * TODO
+   */
+  @Method()
+  toCanvas(): Promise<HTMLCanvasElement> {
+    const canvas = this.instance.getCroppedCanvas();
+    return Promise.resolve(canvas);
+  }
+
+  /**
+   * TODO
+   */
+  @Method()
+  toBase64(): Promise<string> {
+    const base64 = this.instance
+      .getCroppedCanvas()
+      .toDataURL();
+    return Promise.resolve(base64);
+  }
+
+  /**
+   * TODO
+   */
+  @Method()
+  toURL(): Promise<string> {
+    return new Promise((resolve) => {
+      this.instance
+        .getCroppedCanvas()
+        .toBlob(
+          (blob) => resolve(URL.createObjectURL(blob))
+        )
+    })
+  }
+
+  /**
+   * Zoom the canvas (image wrapper) with a relative ratio.
+   * @param ratio - TODO
+   */
+  @Method()
+  zoom(ratio: number): Promise<void> {
+    this.instance?.zoom(ratio);
+    return Promise.resolve();
+  }
+
+  /**
+   * Zoom the canvas (image wrapper) to an absolute ratio.
+   * @param ratio - TODO
+   */
+  @Method()
+  zoomTo(ratio: number): Promise<void> {
+    this.instance?.zoomTo(ratio);
+    return Promise.resolve();
   }
 
   /**
@@ -386,12 +452,69 @@ export class Cropper {
    */
 
   bind() {
-    this.unbind();
     this.instance = new CropperCore(this.$image, this.options);
   }
 
   unbind() {
     this.instance?.destroy();
+  }
+
+  rebind() {
+    this.unbind();
+    this.bind();
+  }
+
+  updateValue(value?) {
+
+    if (!this.instance) return;
+
+    const { height, width } = this.instance?.getContainerData();
+
+    if (value) {
+
+      const toPixel = (a, b) => a * b / 100;
+
+      // TODO this.instance.rotateTo(value.rotate);
+
+      this.instance
+        .setCropBoxData({
+          top: toPixel(value.top, height),
+          left: toPixel(value.left, width),
+          width: toPixel(100 - value.right - value.left, width),
+          height: toPixel(100 - value.top - value.bottom, height),
+        })
+        .setCanvasData({
+          top: toPixel(value.y, height),
+          left: toPixel(value.x, width),
+          width: toPixel(value.width, width),
+          height: toPixel(value.height, height),
+        });
+
+      return;
+    }
+
+    const
+      canvas = this.instance.getCanvasData(),
+      // TODO data = this.instance.getData(),
+      viewport = this.instance.getCropBoxData();
+
+    const toPercent = (a, b) => parseFloat((a / b * 100).toFixed(2));
+
+    this.lock = true;
+
+    this.value = {
+      // TODO rotate: data.rotate,
+      top: toPercent(viewport.top, height),
+      right: toPercent(width - viewport.left - viewport.width, width),
+      bottom: toPercent(height - viewport.top - viewport.height, height),
+      left: toPercent(viewport.left, width),
+      width: toPercent(canvas.width, width),
+      height: toPercent(canvas.height, height),
+      x: toPercent(canvas.left, width),
+      y: toPercent(canvas.top, height),
+    };
+
+    this.lock = false;
   }
 
   /**
@@ -406,8 +529,51 @@ export class Cropper {
 
     switch (name) {
 
+      case 'aspectRatio':
+        if (this.viewportShape !== 'rectangle') break;
+        this.instance?.setAspectRatio(value);
+        break;
+
+      case 'disabled':
+        value ? this.instance?.disable() : this.instance?.enable();
+        break;
+
+      case 'mode':
+        this.instance?.setDragMode(value);
+        this.instance?.clear();
+        this.instance?.crop();
+        break;
+
+      case 'src':
+        this.instance?.replace(this.src, false);
+        break;
+
       case 'value':
-        this.instance?.setData(value);
+        this.updateValue(value);
+        break;
+
+      case 'resizer':
+      case 'resizerShape':
+        break;
+
+      case 'viewportShape':
+
+        const aspectRatio = this.viewportShape === 'rectangle' ? this.options.aspectRatio : 1;
+
+        this.instance?.setAspectRatio(aspectRatio);
+
+        break;
+
+      case 'backdrop':
+      case 'background':
+      case 'guides':
+      case 'indicator':
+      case 'responsive':
+      case 'view':
+      case 'viewport':
+      case 'zoomable':
+      case 'zoomRatio':
+        this.rebind();
         break;
     }
   }
@@ -417,19 +583,21 @@ export class Cropper {
    */
 
   @Bind
-  onCrop(event) {
+  onCrop() {
 
-    this.lock = true;
-
-    this.value = event.detail;
-
-    this.lock = false;
+    this.updateValue();
 
     this.plusCrop.emit();
   }
 
   @Bind
   onReady() {
+
+    // TODO
+    this.value && this.updateValue(this.value);
+
+    this.disabled && this.instance?.disable();
+
     this.plusReady.emit();
   }
 
@@ -448,7 +616,7 @@ export class Cropper {
 
     const result = this.plusZoom.emit(detail);
 
-    if (!result.defaultPrevented) return;
+    if (!result.defaultPrevented) return this.onCrop();
 
     event.preventDefault();
   }
@@ -466,7 +634,6 @@ export class Cropper {
   }
 
   render() {
-    console.log(this.instance)
     return (
       <Host>
         <div class={this.classes}>

@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AspectRatioValue } from "./components/aspect-ratio/aspect-ratio.types";
 import { CardElevation } from "./components/card/card/card.types";
-import { CropperAspectRatio, CropperMode, CropperResizer, CropperResizerShape, CropperResponsive, CropperValue, CropperView, CropperViewport, CropperViewportMode, CropperZoomable, CropperZoomData } from "./components/cropper/cropper.types";
+import { CropperAspectRatio, CropperMode, CropperResizer, CropperResizerShape, CropperResponsive, CropperValue, CropperView, CropperViewport, CropperViewportShape, CropperZoomable, CropperZoomData } from "./components/cropper/cropper.types";
 import { DialogFullscreen, DialogPlacement, DialogSize } from "./components/dialog/dialog/dialog.types";
 import { DrawerBackdrop, DrawerBreakpoint, DrawerPlacement } from "./components/drawer/drawer/drawer.types";
 import { GridAlignContent, GridAlignItems, GridGutter, GridJustifyContent, GridWrap } from "./components/grid/grid/grid.types";
@@ -17,6 +17,7 @@ import { LayoutBottom, LayoutMain, LayoutTop } from "./components/layout/layout.
 import { MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY } from "./components/menu/menu.types";
 import { SpinnerSize, SpinnerType } from "./components/spinner/spinner.types";
 import { StickyState, StickyTop } from "./components/sticky/sticky.types";
+import { ToastPlacement, ToastType } from "./components/toast/toast.types";
 import { TransitionDirection, TransitionDuration, TransitionRepeat } from "./components/transition/transition.types";
 import { SubscribeType } from "./services/tunnel/tunnel.types";
 export namespace Components {
@@ -78,6 +79,14 @@ export namespace Components {
          */
         "disabled"?: boolean;
         /**
+          * Flip horizontal.
+         */
+        "flipX": () => Promise<void>;
+        /**
+          * Flip vertical.
+         */
+        "flipY": () => Promise<void>;
+        /**
           * Show the dashed lines above the viewport.
          */
         "guides"?: boolean;
@@ -94,39 +103,71 @@ export namespace Components {
         "mode"?: CropperMode;
         /**
           * Move the canvas (image wrapper) with relative offsets.
-          * @param offsetX - Moving size (px) in the `horizontal` direction.
-          * @param offsetY - Moving size (px) in the `vertical` direction.
+          * @param offsetX - Moving size (px) in the `horizontal` direction. Use `null` to ignore this.
+          * @param offsetY - Moving size (px) in the `vertical` direction. Use `null` to ignore this.
          */
         "move": (offsetX?: number, offsetY?: number) => Promise<void>;
         /**
           * Move the canvas (image wrapper) to an absolute point.
-          * @param x - The `left` value of the canvas.
-          * @param y - The `top` value of the canvas.
+          * @param x - The `left` value of the canvas. Use `null` to ignore this.
+          * @param y - The `top` value of the canvas. Use `null` to ignore this.
          */
         "moveTo": (x?: number, y?: number) => Promise<void>;
         /**
+          * Reset the image and viewport to their initial states.
+         */
+        "reset": () => Promise<void>;
+        /**
           * TODO
+          * @value main - TODO
+          * @value edge - TODO
+          * @value both - TODO
          */
         "resizer"?: CropperResizer;
         /**
           * TODO
+          * @value square - TODO
+          * @value circle - TODO
+          * @value line   - TODO
          */
         "resizerShape"?: CropperResizerShape;
         /**
           * Re-render the cropper when resizing the window.
+          * @value false - TODO
+          * @value true  - TODO
+          * @value reset - TODO
          */
         "responsive"?: CropperResponsive;
+        /**
+          * Rotate the image with a relative degree.
+          * @param degree - TODO
+         */
+        "rotate": (degree: number) => Promise<void>;
+        /**
+          * Rotate the image to an absolute degree.
+          * @param degree - TODO
+         */
+        "rotateTo": (degree: number) => Promise<void>;
         /**
           * Image source.
          */
         "src"?: string;
         /**
-          * The method creates a Blob object representing the image contained in the canvas; this file  may be cached on the disk or stored in memory at the discretion of the user agent. If type  is not specified, the image type is image/png. The created image is in a resolution of 96dpi.
-          * @param type - A string indicating the image format. The default type is `image/png`.
-          * @param quality - A Number between `0` and `1` indicating image quality if the requested    type is `image/jpeg` or `image/webp`. If this argument is anything else,    the default values `0.92` and `0.80` are used for `image/jpeg` and    `image/webp` respectively. Other arguments are ignored.
-          * @returns A callback function with the resulting Blob object as a single argument.
+          * TODO
          */
-        "toBlob": (type?: string, quality?: number) => Promise<Blob>;
+        "toBase64": () => Promise<string>;
+        /**
+          * TODO
+         */
+        "toBlob": () => Promise<Blob>;
+        /**
+          * TODO
+         */
+        "toCanvas": () => Promise<HTMLCanvasElement>;
+        /**
+          * TODO
+         */
+        "toURL": () => Promise<string>;
         /**
           * TODO
          */
@@ -141,16 +182,33 @@ export namespace Components {
         "view"?: CropperView;
         /**
           * TODO
+          * @value static    - TODO
+          * @value movable   - TODO
+          * @value resizable - TODO
+          * @value both      - TODO
          */
         "viewport"?: CropperViewport;
         /**
           * TODO
+          * @value rectangle - TODO
+          * @value square    - TODO
+          * @value circle    - TODO
          */
-        "viewportMode"?: CropperViewportMode;
+        "viewportShape"?: CropperViewportShape;
+        /**
+          * Zoom the canvas (image wrapper) with a relative ratio.
+          * @param ratio - TODO
+         */
+        "zoom": (ratio: number) => Promise<void>;
         /**
           * Define zoom ratio when zooming the image by wheeling mouse.
          */
         "zoomRatio"?: number;
+        /**
+          * Zoom the canvas (image wrapper) to an absolute ratio.
+          * @param ratio - TODO
+         */
+        "zoomTo": (ratio: number) => Promise<void>;
         /**
           * Enable to zoom the image.
           * @value false - Disable zoom.
@@ -774,6 +832,24 @@ export namespace Components {
          */
         "value"?: string;
     }
+    interface PlusToast {
+        /**
+          * TODO
+         */
+        "duration"?: number;
+        /**
+          * TODO
+         */
+        "open"?: boolean;
+        /**
+          * TODO
+         */
+        "placement"?: ToastPlacement;
+        /**
+          * TODO
+         */
+        "type"?: ToastType;
+    }
     interface PlusTransition {
         /**
           * Specifies the amount of delay before starting the animation to play.  This may be specified in either seconds `s` or milliseconds `ms`.
@@ -983,6 +1059,12 @@ declare global {
         prototype: HTMLPlusTabsTabElement;
         new (): HTMLPlusTabsTabElement;
     };
+    interface HTMLPlusToastElement extends Components.PlusToast, HTMLStencilElement {
+    }
+    var HTMLPlusToastElement: {
+        prototype: HTMLPlusToastElement;
+        new (): HTMLPlusToastElement;
+    };
     interface HTMLPlusTransitionElement extends Components.PlusTransition, HTMLStencilElement {
     }
     var HTMLPlusTransitionElement: {
@@ -1026,6 +1108,7 @@ declare global {
         "plus-tabs-panel": HTMLPlusTabsPanelElement;
         "plus-tabs-panels": HTMLPlusTabsPanelsElement;
         "plus-tabs-tab": HTMLPlusTabsTabElement;
+        "plus-toast": HTMLPlusToastElement;
         "plus-transition": HTMLPlusTransitionElement;
         "plus-tunnel-consumer": HTMLPlusTunnelConsumerElement;
     }
@@ -1121,14 +1204,23 @@ declare namespace LocalJSX {
         "onPlusZoom"?: (event: CustomEvent<CropperZoomData>) => void;
         /**
           * TODO
+          * @value main - TODO
+          * @value edge - TODO
+          * @value both - TODO
          */
         "resizer"?: CropperResizer;
         /**
           * TODO
+          * @value square - TODO
+          * @value circle - TODO
+          * @value line   - TODO
          */
         "resizerShape"?: CropperResizerShape;
         /**
           * Re-render the cropper when resizing the window.
+          * @value false - TODO
+          * @value true  - TODO
+          * @value reset - TODO
          */
         "responsive"?: CropperResponsive;
         /**
@@ -1149,12 +1241,19 @@ declare namespace LocalJSX {
         "view"?: CropperView;
         /**
           * TODO
+          * @value static    - TODO
+          * @value movable   - TODO
+          * @value resizable - TODO
+          * @value both      - TODO
          */
         "viewport"?: CropperViewport;
         /**
           * TODO
+          * @value rectangle - TODO
+          * @value square    - TODO
+          * @value circle    - TODO
          */
-        "viewportMode"?: CropperViewportMode;
+        "viewportShape"?: CropperViewportShape;
         /**
           * Define zoom ratio when zooming the image by wheeling mouse.
          */
@@ -1834,6 +1933,24 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
+    interface PlusToast {
+        /**
+          * TODO
+         */
+        "duration"?: number;
+        /**
+          * TODO
+         */
+        "open"?: boolean;
+        /**
+          * TODO
+         */
+        "placement"?: ToastPlacement;
+        /**
+          * TODO
+         */
+        "type"?: ToastType;
+    }
     interface PlusTransition {
         /**
           * Specifies the amount of delay before starting the animation to play.  This may be specified in either seconds `s` or milliseconds `ms`.
@@ -1908,6 +2025,7 @@ declare namespace LocalJSX {
         "plus-tabs-panel": PlusTabsPanel;
         "plus-tabs-panels": PlusTabsPanels;
         "plus-tabs-tab": PlusTabsTab;
+        "plus-toast": PlusToast;
         "plus-transition": PlusTransition;
         "plus-tunnel-consumer": PlusTunnelConsumer;
     }
@@ -1946,6 +2064,7 @@ declare module "@stencil/core" {
             "plus-tabs-panel": LocalJSX.PlusTabsPanel & JSXBase.HTMLAttributes<HTMLPlusTabsPanelElement>;
             "plus-tabs-panels": LocalJSX.PlusTabsPanels & JSXBase.HTMLAttributes<HTMLPlusTabsPanelsElement>;
             "plus-tabs-tab": LocalJSX.PlusTabsTab & JSXBase.HTMLAttributes<HTMLPlusTabsTabElement>;
+            "plus-toast": LocalJSX.PlusToast & JSXBase.HTMLAttributes<HTMLPlusToastElement>;
             "plus-transition": LocalJSX.PlusTransition & JSXBase.HTMLAttributes<HTMLPlusTransitionElement>;
             "plus-tunnel-consumer": LocalJSX.PlusTunnelConsumer & JSXBase.HTMLAttributes<HTMLPlusTunnelConsumerElement>;
         }
