@@ -1,6 +1,10 @@
 :host {
-    display: inline-block;
-    position: relative;
+    display: none;
+    position: absolute;
+}
+
+:host([data-show]) {
+  display: block;
 }
 
 .activator {
