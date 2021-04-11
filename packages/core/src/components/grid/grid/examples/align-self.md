@@ -1,13 +1,12 @@
-TODO: align-self on grid-item overrides grid align-items
-
 ```css [style]
 plus-grid {
-  background-color: #fafafa;
-  height: 140px;
+  background-color: #EEEEEE;
+  height: 8rem;
 }
-.box {
-  border: 1px solid #ccc;
-  background-color: #eee;
+div {
+  color: #00BCD4;
+  border: 1px solid #FFFFFF;
+  background-color: #E0F7FA;
   padding: 0.5em;
   text-align: center;
 }
@@ -16,17 +15,17 @@ plus-grid {
 ```html [template]
 <plus-grid align-items="center">
   <plus-grid-item xs="grow" align-self="start">
-    <div class="box">
+    <div>
       Item
     </div>
   </plus-grid-item>
   <plus-grid-item xs="grow">
-    <div class="box">
+    <div>
       Item
     </div>
   </plus-grid-item>
   <plus-grid-item xs="grow" align-self="end">
-    <div class="box">
+    <div>
       Item
     </div>
   </plus-grid-item>

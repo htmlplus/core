@@ -1,11 +1,11 @@
-import { Component, Element, Event, EventEmitter, Host, Prop, Watch, h } from '@stencil/core';
-import { Animation, Bind, GlobalConfig, Media, OutsideClick, Scrollbar } from '@app/services';
+import { Component, Host, Element, Event, EventEmitter, Prop, State, Watch, h } from '@stencil/core';
+import { Animation, Bind, ClickOutside, GlobalConfig, Media, Scrollbar } from '@app/services';
 import * as Utils from '@app/utils';
 import { DrawerLink, Inject, rebind } from './drawer.link';
 import { DrawerBackdrop, DrawerBreakpoint, DrawerPlacement } from './drawer.types';
 
 /**
- * TODO
+ * This component lets you add collapsible side contents like navigation alongside some primary content.
  * @group drawer
  * @slot - The default slot
  */
@@ -17,31 +17,34 @@ import { DrawerBackdrop, DrawerBreakpoint, DrawerPlacement } from './drawer.type
 export class Drawer {
 
   /**
-   * Activate the drawer’s backdrop to show or not.
+   * Activate the drawer's backdrop to show or not.
    */
   @Prop()
   backdrop?: DrawerBackdrop = 'auto';
 
   /**
-   * TODO
+   * Sets the mobile breakpoint to apply alternate styles for mobile devices when the breakpoint value is met.
    */
   @Prop()
   breakpoint?: DrawerBreakpoint = 'md';
 
   /**
-   * TODO
+   * This property helps you to attach which drawer toggler controls the drawer. 
+   * It doesn't matter where the drawer toggler is. 
+   * You can put the drawer's toggler inside or outside of the drawer. 
+   * Read more about connectors [here](https://htmlplus.io/features/connector).
    */
   @Prop()
   connector?: string;
 
   /**
-   * TODO
+   * Set the width of drawer to the minimum size you specified for the `mini-size` property.
    */
   @Prop()
   mini?: boolean;
 
   /**
-   * TODO
+   * Sets the minimum width size of the drawer.
    */
   @Prop()
   miniSize?: string;
@@ -53,34 +56,34 @@ export class Drawer {
   open?: boolean;
 
   /**
-   * TODO
+   * If true, don't allow the drawer to be closed by clicking outside of the drawer. If false, the drawer will be closed by clicking outside of it.
    */
   @Prop()
   persistent?: boolean;
 
   /**
-   * TODO
+   * Specifies where the drawer will open.
    */
   @Prop()
   placement?: DrawerPlacement;
 
   /**
-   * TODO
+   * It controls the flexibility of the drawer's width. If yes, the width of the drawer can be reduced. If false doesn't allow the width of the drawer to reduce. 
    */
   @Prop()
-  reverse?: boolean;
+  flexible?: boolean;
 
   /**
-   * TODO
+   * Determine the width of the drawer.
    */
   @Prop()
   size?: string;
 
   /**
-   * TODO
+   * On default the drawer is considered as a part of the main container. it pushes the other contents on opening. If true it will be opened over other contents and doesn't affect other contents. A temporary drawer sits above its application and uses a backdrop to darken the background. 
    */
-  @Prop({ reflect: true })
-  temporary?: boolean;
+  @Prop()
+  temporary?: boolean | 'on-breakpoint';
 
   /**
    * When the drawer is going to hide
@@ -129,12 +132,22 @@ export class Drawer {
     toggle: () => this.toggle()
   };
 
+  @State()
+  state?: 'desktop' | 'mobile';
+
   @Element()
   $host!: HTMLElement;
 
   $content!: HTMLElement;
 
   animations: { open?: Animation, mini?: Animation } = {};
+
+  get attributes() {
+    return {
+      state: this.state,
+      style: this.styles,
+    }
+  }
 
   get classes() {
 
@@ -144,14 +157,14 @@ export class Drawer {
       'content',
       {
         [placement]: true,
-        reverse: this.reverse
+        reverse: this.flexible
       }
     );
   }
 
   get hasBackdrop() {
 
-    if (!this.temporary) return false;
+    if (!this.isTemporary) return false;
 
     if (this.backdrop === true || this.backdrop === 'auto') return true;
 
@@ -164,6 +177,15 @@ export class Drawer {
 
   get isRTL() {
     return Utils.isRTL(this);
+  }
+
+  get isTemporary() {
+
+    if (this.temporary === true) return true;
+
+    if (this.temporary === 'on-breakpoint' && this.state === 'mobile') return true;
+
+    return false;
   }
 
   get styles() {
@@ -246,7 +268,7 @@ export class Drawer {
 
     Scrollbar.reset(this);
 
-    OutsideClick.remove(this.$content);
+    ClickOutside.remove(this.$content);
 
     this.$host.classList.remove('open');
 
@@ -257,9 +279,9 @@ export class Drawer {
 
   shown() {
 
-    this.temporary && Scrollbar.remove(this);
+    this.isTemporary && Scrollbar.remove(this);
 
-    OutsideClick.add(this.$content, this.onOutsideClick);
+    ClickOutside.add(this.$content, this.onOutsideClick, false);
 
     this.$host.classList.add('open');
 
@@ -320,15 +342,19 @@ export class Drawer {
    * Events handler
    */
 
+  @Bind
   @Media('[breakpoint]-down')
-  onMedia() {
-    // TODO : console.log('drawer', event)
+  onMedia(event) {
+
+    this.state = event.matches ? 'mobile' : 'desktop';
+
+    if (!event.matches && this.open) this.open = false;
   }
 
   @Bind
   onOutsideClick() {
 
-    if (!this.isOpen || !this.temporary || this.persistent) return;
+    if (!this.isOpen || !this.isTemporary || this.persistent) return;
 
     this.hide();
   }
@@ -350,7 +376,7 @@ export class Drawer {
 
   render() {
     return (
-      <Host style={this.styles}>
+      <Host {...this.attributes}>
         {this.hasBackdrop && (<div class="backdrop"><div /></div>)}
         <div
           class={this.classes}
@@ -359,6 +385,6 @@ export class Drawer {
           <slot />
         </div>
       </Host >
-    );
+    )
   }
 }

@@ -1,10 +1,11 @@
 import { Component, Element, Event, EventEmitter, Host, Prop, h } from '@stencil/core';
-import { Bind } from '@app/services';
-import { TransitionDirection, TransitionDuration, TransitionPause, TransitionRepeat, TransitionStart } from './transition.types';
+import { Bind, GlobalConfig } from '@app/services';
+import { TransitionDirection, TransitionDuration, TransitionRepeat } from './transition.types';
 
 /**
- * TODO
- * @development
+ * This component allows you to apply an animation on your component such as fade or other animations. 
+ * click [here](ROUTE:COMPONENT:TRANSITION:PROPERTY:NAME) to see and choose your favorite animation from a wide range of animation we provide for you.
+ * @examples default, name, duration
  */
 @Component({
   tag: 'plus-transition',
@@ -14,89 +15,121 @@ import { TransitionDirection, TransitionDuration, TransitionPause, TransitionRep
 export class Transition {
 
   /**
-   * TODO
+   * Specifies the amount of delay before starting the animation to play. 
+   * This may be specified in either seconds `s` or milliseconds `ms`.
    */
   @Prop()
-  delay?: string;
+  delay?: string = '0s';
 
   /**
-   * TODO
+   * Defines whether an animation should be played forwards, backwards or in alternate cycles.
    */
   @Prop()
-  direction?: TransitionDirection;
+  direction?: TransitionDirection = 'normal';
 
   /**
-   * TODO
+   * Specifies the length of time it will take to complete one cycle between two defined states.
+   * You can also use the reservation values `slower`, `slow`, `normal`, `fast` and `faster`.
    */
   @Prop()
   duration?: TransitionDuration = 'normal';
 
   /**
-   * TODO
+   * Specifies what kind of animation you want to play. 
+   * click [here](ROUTE:COMPONENT:TRANSITION:PROPERTY:NAME) to see the list of available animations.
    */
   @Prop({ reflect: true })
   name: string;
 
   /**
-   * TODO
+   * Specifies the time that animation should be paused.
    */
-  @Prop({ reflect: true })
-  pause?: TransitionPause;
+  // @Prop({ reflect: true })
+  // pause?: TransitionPause;
 
   /**
-   * TODO
+   * Specifies the time that animation will start.
    */
-  @Prop({ reflect: true })
-  start?: TransitionStart;
+  // @Prop({ reflect: true })
+  // start?: TransitionStart;
 
   /**
-   * TODO
+   * Specifies the number of times the animation should be repeated after one complete cycle.
    */
   @Prop()
-  repeat?: TransitionRepeat;
+  repeat?: TransitionRepeat = 1;
 
   /**
-   * TODO
+   * This event is fired any time the animation has been canceled.
    */
   @Event({
     bubbles: false,
     cancelable: true
   })
-  plusCancel!: EventEmitter;
+  plusCancel!: EventEmitter<void>;
 
   /**
-   * TODO
+   * This event is fired when animation has been completed.
    */
   @Event({
     bubbles: false,
     cancelable: true
   })
-  plusEnd!: EventEmitter;
+  plusEnd!: EventEmitter<void>;
 
   /**
-   * TODO
+   * This event is fired any time a new cycle has been started. 
    */
   @Event({
     bubbles: false,
     cancelable: true
   })
-  plusIteration!: EventEmitter;
+  plusIteration!: EventEmitter<void>;
 
   /**
-   * TODO
+   * This event is fired when animation has been started.
    */
   @Event({
     bubbles: false,
     cancelable: true
   })
-  plusStart!: EventEmitter;
+  plusStart!: EventEmitter<void>;
+
+  @GlobalConfig('transition', {
+    delay: '0s',
+    direction: 'normal',
+    duration: 'normal',
+    repeat: 1,
+  })
+  config?;
 
   @Element()
   $host!: HTMLElement;
 
+  parser(input) {
+
+    if (!input) return input;
+
+    const regexp = /random\((\d+|(\d+)?\.\d+)(s|ms)(\s+)?(,)(\s+)?(\d+|(\d+)?\.\d+)(s|ms)(\s+)?(,)?(\s+)?(\d+)?\)/g;
+
+    const matches = input.match(regexp);
+
+    if (!matches) return input;
+
+    const [expression] = matches;
+
+    let [from, to, fixed] = expression.replace(/random\(|\)/g, '').split(',').map((value) => value.trim());
+
+    [from, to] = [from, to].map((value) => value.match(/ms/) ? parseFloat(value) / 1000 : parseFloat(value)).sort();
+
+    const value = from + Math.random() * (to - from);
+
+    return typeof fixed !== 'undefined' ? value.toFixed(fixed) : value;
+  }
+
   get styles() {
     return {
-      '--plus-transition-delay': this.delay ?? null,
+      '--plus-transition-delay': this.delay ? this.parser(this.delay) : null,
       '--plus-transition-duration': isNaN(parseFloat(this.duration)) ? null : this.duration,
       '--plus-transition-repeat': this.repeat as any ?? null,
     }

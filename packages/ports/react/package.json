@@ -1,9 +1,9 @@
 {
   "name": "@htmlplus/react",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "loader"
@@ -12,8 +12,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rollup -c",
-    "build:watch": "rollup -c -w",
+    "build": "npm run clean && rollup -c",
     "clean": "rimraf dist"
   },
   "devDependencies": {
@@ -34,6 +33,6 @@
     "react-dom": "^16.0.0 || ^17.0.0"
   },
   "dependencies": {
-    "@htmlplus/core": "^0.1.2"
+    "@htmlplus/core": "^0.2.1"
   }
 }

@@ -1,9 +1,8 @@
-TODO: wrap is enable by default. if more than 12 you can off.
-
 ```css [style]
-.box {
-  border: 1px solid #ccc;
-  background-color: #eee;
+div {
+  color: #00BCD4;
+  border: 1px solid #FFFFFF;
+  background-color: #E0F7FA;
   padding: 0.5em;
   text-align: center;
 }
@@ -12,22 +11,22 @@ TODO: wrap is enable by default. if more than 12 you can off.
 ```html [template]
 <plus-grid wrap="off">
   <plus-grid-item xs="6">
-    <div class="box">
+    <div>
       xs=6
     </div>
   </plus-grid-item>
   <plus-grid-item xs="2">
-    <div class="box">
+    <div>
       xs=2
     </div>
   </plus-grid-item>
   <plus-grid-item xs="6">
-    <div class="box">
+    <div>
       xs=6
     </div>
   </plus-grid-item>
   <plus-grid-item xs="2">
-    <div class="box">
+    <div>
       xs=2
     </div>
   </plus-grid-item>

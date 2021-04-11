@@ -1,0 +1,62 @@
+@import 'all';
+@import 'reset';
+@import 'breadcrumb.variables';
+
+:host {
+
+  /**
+   * @prop --plus-breadcrumb-gutter-x: TODO
+   */
+
+  --plus-breadcrumb-gutter-x                 : #{$breadcrumb-gutter-x};
+  --plus-breadcrumb-expander-background-color: #{$breadcrumb-expander-background-color};
+  --plus-breadcrumb-expander-border-radius   : #{$breadcrumb-expander-border-radius};
+  --plus-breadcrumb-expander-color           : #{$breadcrumb-expander-color};
+  --plus-breadcrumb-expander-height          : #{$breadcrumb-expander-height};
+  --plus-breadcrumb-expander-width           : #{$breadcrumb-expander-width};
+  --plus-breadcrumb-separator-color          : #{$breadcrumb-separator-color};
+  --plus-breadcrumb-separator-height         : #{$breadcrumb-separator-height};
+  --plus-breadcrumb-separator-width          : #{$breadcrumb-separator-width};
+}
+
+:host {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.separator {
+  color: var(--plus-breadcrumb-separator-color);
+  height: var(--plus-breadcrumb-separator-height);
+  width: var(--plus-breadcrumb-separator-width);
+  padding: 0 var(--plus-breadcrumb-gutter-x);
+  text-align: center;
+}
+
+.rtl {
+  transform: scaleX(-1);
+}
+
+svg {
+  fill: var(--plus-breadcrumb-separator-color);
+  width: 100%;
+  height: 100%;
+}
+
+.expander {
+  background-color: var(--plus-breadcrumb-expander-background-color);
+  border-radius: var(--plus-breadcrumb-expander-border-radius);
+  color: var(--plus-breadcrumb-expander-color);
+  height: var(--plus-breadcrumb-expander-height);
+  width: var(--plus-breadcrumb-expander-width);
+  user-select: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  &:focus {
+    // outline: none;
+  }
+  svg {
+    fill: currentColor;
+    display: block;
+  }
+}

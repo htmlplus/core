@@ -1,5 +1,11 @@
+```css [style]
+div {
+  text-align: center;
+}
+```
+
 ```html [template]
-<preview>
-    <plus-spinner></plus-spinner>
-</preview>
+<div>
+  <plus-spinner></plus-spinner>
+</div>
 ```

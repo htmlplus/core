@@ -1,0 +1,33 @@
+@import 'reset';
+@import 'divider.variables';
+
+:host {
+
+  /**
+  * @prop --plus-divider-background-color: Used to adjust the background color.
+  * @prop --plus-divider-weight          : Used to adjust the weight.
+  */
+
+  --plus-divider-background-color: #{$divider-background-color};
+  --plus-divider-weight          : #{$divider-weight};
+}
+
+:host {
+  background-color: var(--plus-divider-background-color);
+  display: block;
+}
+
+:host {
+  height: var(--plus-divider-weight);
+  min-height: auto;
+  width: auto;
+  min-width: 100%;
+}
+
+:host([vertical]) {  
+  width: var(--plus-divider-weight);
+  min-width: auto;
+  height: auto;
+  min-height: 100%;
+  align-self: stretch
+}

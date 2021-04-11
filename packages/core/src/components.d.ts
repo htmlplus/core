@@ -5,24 +5,62 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { AspectRatioValue } from "./components/aspect-ratio/aspect-ratio.types";
+import { CardElevation } from "./components/card/card/card.types";
+import { CropperMode, CropperResizer, CropperResizerShape, CropperResponsive, CropperShape, CropperValue, CropperView, CropperZoomable, CropperZoomData } from "./components/cropper/cropper.types";
 import { DialogFullscreen, DialogPlacement, DialogSize } from "./components/dialog/dialog/dialog.types";
 import { DrawerBackdrop, DrawerBreakpoint, DrawerPlacement } from "./components/drawer/drawer/drawer.types";
-import { AlignContents, AlignItems, Gutters, Justifies, Wraps } from "./components/grid/grid/grid.types";
-import { AlignSelfs, Columns, Offsets, Orders } from "./components/grid/grid-item/grid-item.types";
+import { GridAlignContent, GridAlignItems, GridGutter, GridJustifyContent, GridWrap } from "./components/grid/grid/grid.types";
+import { GridItemAlignSelf, GridItemColumn, GridItemOffset, GridItemOrder } from "./components/grid/grid-item/grid-item.types";
+import { IntersectionBehavior } from "./components/intersection/intersection.types";
+import { LayoutBottom, LayoutMain, LayoutTop } from "./components/layout/layout.types";
 import { MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY } from "./components/menu/menu.types";
 import { SpinnerSize, SpinnerType } from "./components/spinner/spinner.types";
-import { TransitionDirection, TransitionDuration, TransitionPause, TransitionRepeat, TransitionStart } from "./components/transition/transition.types";
+import { StickyState, StickyTop } from "./components/sticky/sticky.types";
+import { ToastPlacement } from "./components/toast/toast.types";
+import { TooltipPlacement, TooltipTrigger } from "./components/tooltip/tooltip.types";
+import { TransitionDirection, TransitionDuration, TransitionRepeat } from "./components/transition/transition.types";
 import { SubscribeType } from "./services/tunnel/tunnel.types";
 export namespace Components {
     interface PlusAspectRatio {
         /**
           * Specifies the ratio.
          */
-        "value"?: number | string;
+        "value"?: AspectRatioValue;
+    }
+    interface PlusBreadcrumb {
+        /**
+          * TODO
+         */
+        "expanderText"?: string;
+        /**
+          * TODO
+         */
+        "max"?: number;
+        /**
+          * TODO
+         */
+        "offset"?: number;
+        /**
+          * TODO: Separator type is one of `none`, `circle`, `space`, `arrow`.
+         */
+        "separator"?: string;
     }
     interface PlusCard {
         /**
-          * TODO
+          * If you want the card to have shadow, use the elevation property,  And select the property value between `1` and `24`.
+         */
+        "elevation"?: CardElevation;
+        /**
+          * Use the flat property to neutralize elevation.
+         */
+        "flat"?: boolean;
+        /**
+          * If you want the card to have border, use the outlined property.
+         */
+        "outlined"?: boolean;
+        /**
+          * Use tile property to neutralize border-radius.
          */
         "tile"?: boolean;
     }
@@ -32,21 +70,172 @@ export namespace Components {
     }
     interface PlusCardHeader {
     }
-    interface PlusDialog {
+    interface PlusClickOutside {
         /**
-          * Activate the dialog’s backdrop to show or not.
+          * Disable the component.
+         */
+        "disabled"?: boolean;
+        /**
+          * The callback occurs only once.
+         */
+        "once"?: boolean;
+    }
+    interface PlusCropper {
+        /**
+          * A number between 0 and 1. Define the automatic cropping area size.
+         */
+        "area"?: number;
+        /**
+          * Defines the initial aspect ratio of the viewport.
+         */
+        "aspectRatio"?: number;
+        /**
+          * Shows the black modal above the image and under the viewport.
          */
         "backdrop"?: boolean;
         /**
-          * Used to connect dialog and dialog-action components. This property helps you to attach which dialog action controls the dialog. It doesn't matter where the dialog action is. You can put the dialog’s action inside or outside of the dialog. Read more about connectors here.
+          * Shows the grid background of the container.
+         */
+        "background"?: boolean;
+        /**
+          * Disables the cropper.
+         */
+        "disabled"?: boolean;
+        /**
+          * Flip horizontal.
+         */
+        "flipX": () => Promise<void>;
+        /**
+          * Flip vertical.
+         */
+        "flipY": () => Promise<void>;
+        /**
+          * Shows the dashed lines above the viewport.
+         */
+        "guides"?: boolean;
+        /**
+          * Shows the center indicator above the viewport.
+         */
+        "indicator"?: boolean;
+        /**
+          * Defines the cropping mode of the cropper.
+          * @value crop - Creates a new viewport and allows you to move and resize it.
+          * @value move - moves the canvas and viewport.
+         */
+        "mode"?: CropperMode;
+        /**
+          * Move the canvas with relative offsets.
+          * @param offsetX - Moving size (px) in the `horizontal` direction. Use `null` to ignore this.
+          * @param offsetY - Moving size (px) in the `vertical` direction. Use `null` to ignore this.
+         */
+        "move": (offsetX?: number, offsetY?: number) => Promise<void>;
+        /**
+          * Move the canvas to an absolute point.
+          * @param x - The `left` value of the canvas. Use `null` to ignore this.
+          * @param y - The `top` value of the canvas. Use `null` to ignore this.
+         */
+        "moveTo": (x?: number, y?: number) => Promise<void>;
+        /**
+          * Reset the image and viewport to their initial states.
+         */
+        "reset": () => Promise<void>;
+        /**
+          * Enables to resize the viewport by dragging (Works when the value of the `mode` property is `crop`).
+          * @value main - Enables to resize the viewport by dragging on the Sides.
+          * @value edge - Enables to resize the viewport by dragging on the vertices.
+          * @value both - Enables to resize the viewport by dragging on the Sides and vertices.
+         */
+        "resizer"?: CropperResizer;
+        /**
+          * Specifies the shape of the resizer.
+         */
+        "resizerShape"?: CropperResizerShape;
+        /**
+          * Re-renders the cropper when resizing the window.
+          * @value reset - Restores the cropped area after resizing the window.
+         */
+        "responsive"?: CropperResponsive;
+        /**
+          * Rotate the image with a relative degree.
+         */
+        "rotate": (degree: number) => Promise<void>;
+        /**
+          * Rotate the image to an absolute degree.
+         */
+        "rotateTo": (degree: number) => Promise<void>;
+        /**
+          * Specifies the shape of the viewport.
+         */
+        "shape"?: CropperShape;
+        /**
+          * Replace the image's src and rebuild the cropper.
+         */
+        "src"?: string;
+        /**
+          * Gets `base64` from the cropped image.
+         */
+        "toBase64": () => Promise<string>;
+        /**
+          * Gets `blob` value from the cropped image.
+         */
+        "toBlob": () => Promise<Blob>;
+        /**
+          * Gets `canvas` from the cropped image.
+         */
+        "toCanvas": () => Promise<HTMLCanvasElement>;
+        /**
+          * Gets `blob url` from the cropped image.
+         */
+        "toURL": () => Promise<string>;
+        /**
+          * The previous cropped data if you had stored, will be passed to value automatically when initialized.
+         */
+        "value"?: CropperValue;
+        /**
+          * Define the view mode of the cropper. If you set viewMode to `none`, the viewport can extend  outside the canvas, while a value of `fit`, `contain` or `cover` will restrict the viewport  to the size of the canvas. A viewMode of `contain` or `cover` will additionally restrict the  canvas to the container. Note that if the proportions of the canvas and the container are  the same, there is no difference between `contain` and `cover`.
+          * @value contain - restrict the minimum canvas size to fit within the container. If the            proportions of the canvas and the container differ, the minimum canvas will be            surrounded by extra space in one of the dimensions.
+          * @value cover   - restrict the minimum canvas size to fill fit the container. If the proportions            of the canvas and the container are different, the container will not be able            to fit the whole canvas in one of the dimensions.
+          * @value fit     - restrict the viewport to not exceed the size of the canvas.
+          * @value none    - no restrictions.
+         */
+        "view"?: CropperView;
+        /**
+          * Zoom the canvas with a relative ratio.
+         */
+        "zoom": (ratio: number) => Promise<void>;
+        /**
+          * Defines zoom ratio when zooming the image by wheeling mouse.
+         */
+        "zoomRatio"?: number;
+        /**
+          * Zoom the canvas to an absolute ratio.
+         */
+        "zoomTo": (ratio: number) => Promise<void>;
+        /**
+          * Enables to zoom the image.
+          * @value false - Unable to zoom the image.
+          * @value true  - Enables to zoom the image by touching and wheeling mouse.
+          * @value touch - Enables to zoom the image by touching.
+          * @value wheel - Enables to zoom the image by wheeling mouse.
+          * @
+         */
+        "zoomable"?: CropperZoomable;
+    }
+    interface PlusDialog {
+        /**
+          * Activate the dialog's backdrop to show or not.
+         */
+        "backdrop"?: boolean;
+        /**
+          * This property helps you to attach which dialog toggler controls the dialog.  It doesn't matter where the dialog toggler is.  You can put the dialog's toggler inside or outside of the dialog.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
         /**
-          * Set the height of the dialog as much as the screen’s height.
+          * Set the height of the dialog as much as the screen's height.
          */
         "fullHeight"?: boolean;
         /**
-          * Set the width of the dialog as much as the screen’s width.
+          * Set the width of the dialog as much as the screen's width.
          */
         "fullWidth"?: boolean;
         /**
@@ -74,11 +263,11 @@ export namespace Components {
          */
         "scrollable"?: boolean;
         /**
-          * TODO
+          * Determine the width of the dialog.
          */
         "size"?: DialogSize;
         /**
-          * TODO
+          * Removes the margin around the dialog's content.
          */
         "sticky"?: boolean;
     }
@@ -100,29 +289,39 @@ export namespace Components {
     }
     interface PlusDialogToggler {
         /**
-          * TODO
+          * This property helps you to attach which dialog this toggler controls.  It doesn't matter where the dialog toggler is.  You can put the dialog's toggler inside or outside of the dialog.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
     }
+    interface PlusDivider {
+        /**
+          * You can use vertical property for vertical division.
+         */
+        "vertical"?: boolean;
+    }
     interface PlusDrawer {
         /**
-          * Activate the drawer’s backdrop to show or not.
+          * Activate the drawer's backdrop to show or not.
          */
         "backdrop"?: DrawerBackdrop;
         /**
-          * TODO
+          * Sets the mobile breakpoint to apply alternate styles for mobile devices when the breakpoint value is met.
          */
         "breakpoint"?: DrawerBreakpoint;
         /**
-          * TODO
+          * This property helps you to attach which drawer toggler controls the drawer.  It doesn't matter where the drawer toggler is.  You can put the drawer's toggler inside or outside of the drawer.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
         /**
-          * TODO
+          * It controls the flexibility of the drawer's width. If yes, the width of the drawer can be reduced. If false doesn't allow the width of the drawer to reduce.
+         */
+        "flexible"?: boolean;
+        /**
+          * Set the width of drawer to the minimum size you specified for the `mini-size` property.
          */
         "mini"?: boolean;
         /**
-          * TODO
+          * Sets the minimum width size of the drawer.
          */
         "miniSize"?: string;
         /**
@@ -130,29 +329,25 @@ export namespace Components {
          */
         "open"?: boolean;
         /**
-          * TODO
+          * If true, don't allow the drawer to be closed by clicking outside of the drawer. If false, the drawer will be closed by clicking outside of it.
          */
         "persistent"?: boolean;
         /**
-          * TODO
+          * Specifies where the drawer will open.
          */
         "placement"?: DrawerPlacement;
         /**
-          * TODO
-         */
-        "reverse"?: boolean;
-        /**
-          * TODO
+          * Determine the width of the drawer.
          */
         "size"?: string;
         /**
-          * TODO
+          * On default the drawer is considered as a part of the main container. it pushes the other contents on opening. If true it will be opened over other contents and doesn't affect other contents. A temporary drawer sits above its application and uses a backdrop to darken the background.
          */
-        "temporary"?: boolean;
+        "temporary"?: boolean | 'on-breakpoint';
     }
     interface PlusDrawerToggler {
         /**
-          * TODO
+          * This property helps you to attach which drawer this toggler controls.  It doesn't matter where the drawer toggler is.  You can put the drawer's toggler inside or outside of the drawer.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
     }
@@ -160,87 +355,99 @@ export namespace Components {
         /**
           * Aligns contents vertically across all rows (It overrides alignItems).
          */
-        "alignContent"?: AlignContents;
+        "alignContent"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for large display sizes (It overrides alignItemsLg).
          */
-        "alignContentLg"?: AlignContents;
+        "alignContentLg"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for medium display sizes (It overrides alignItemsMd).
          */
-        "alignContentMd"?: AlignContents;
+        "alignContentMd"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for small display sizes (It overrides alignItemsSm).
          */
-        "alignContentSm"?: AlignContents;
+        "alignContentSm"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for extra-large display sizes (It overrides alignItemsXl).
          */
-        "alignContentXl"?: AlignContents;
+        "alignContentXl"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for extra-small display sizes (It overrides alignItemsXs).
          */
-        "alignContentXs"?: AlignContents;
+        "alignContentXs"?: GridAlignContent;
+        /**
+          * Aligns contents vertically across all rows for extra-extra-large display sizes (It overrides alignItemsXXl).
+         */
+        "alignContentXxl"?: GridAlignContent;
         /**
           * Aligns contents vertically inside their own row.
          */
-        "alignItems"?: AlignItems;
+        "alignItems"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for large display sizes.
          */
-        "alignItemsLg"?: AlignItems;
+        "alignItemsLg"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for medium display sizes.
          */
-        "alignItemsMd"?: AlignItems;
+        "alignItemsMd"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for small display sizes.
          */
-        "alignItemsSm"?: AlignItems;
+        "alignItemsSm"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for extra-large display sizes.
          */
-        "alignItemsXl"?: AlignItems;
+        "alignItemsXl"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for extra-small display sizes.
          */
-        "alignItemsXs"?: AlignItems;
+        "alignItemsXs"?: GridAlignItems;
+        /**
+          * Aligns contents vertically inside their own row for extra-extra-large display sizes.
+         */
+        "alignItemsXxl"?: GridAlignItems;
         /**
           * Adds a gap between contents to make space between them vertically and horizontally.
          */
-        "gutter"?: Gutters;
+        "gutter"?: GridGutter;
         /**
           * Adds a gap between contents to make space between them horizontally.
          */
-        "gutterX"?: Gutters;
+        "gutterX"?: GridGutter;
         /**
           * Adds a gap between contents to make space between them vertically.
          */
-        "gutterY"?: Gutters;
+        "gutterY"?: GridGutter;
         /**
           * Justifies contents horizontally.
          */
-        "justify"?: Justifies;
+        "justifyContent"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for large display sizes.
          */
-        "justifyLg"?: Justifies;
+        "justifyContentLg"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for medium display sizes.
          */
-        "justifyMd"?: Justifies;
+        "justifyContentMd"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for small display sizes.
          */
-        "justifySm"?: Justifies;
+        "justifyContentSm"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for extra-large display sizes.
          */
-        "justifyXl"?: Justifies;
+        "justifyContentXl"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for extra-small display sizes.
          */
-        "justifyXs"?: Justifies;
+        "justifyContentXs"?: GridJustifyContent;
+        /**
+          * Justifies contents horizontally for extra-extra-large display sizes.
+         */
+        "justifyContentXxl"?: GridJustifyContent;
         /**
           * Reverses the flow of contents from left-to-right to right-to-left, or vice-versa.
          */
@@ -252,53 +459,61 @@ export namespace Components {
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width.
          */
-        "wrap"?: Wraps;
+        "wrap"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for large screen devices.
          */
-        "wrapLg"?: Wraps;
+        "wrapLg"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for medium screen devices.
          */
-        "wrapMd"?: Wraps;
+        "wrapMd"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for small screen devices.
          */
-        "wrapSm"?: Wraps;
+        "wrapSm"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-large screen devices.
          */
-        "wrapXl"?: Wraps;
+        "wrapXl"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-small screen devices.
          */
-        "wrapXs"?: Wraps;
+        "wrapXs"?: GridWrap;
+        /**
+          * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-extra-large screen devices.
+         */
+        "wrapXxl"?: GridWrap;
     }
     interface PlusGridItem {
         /**
           * Aligns the grid-item vertically in its container (grid). It overrides the align-items property of its parent.
          */
-        "alignSelf"?: AlignSelfs;
+        "alignSelf"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for large breakpoints).
          */
-        "alignSelfLg"?: AlignSelfs;
+        "alignSelfLg"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for medium breakpoints).
          */
-        "alignSelfMd"?: AlignSelfs;
+        "alignSelfMd"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for small breakpoints).
          */
-        "alignSelfSm"?: AlignSelfs;
+        "alignSelfSm"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for extra-large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-large breakpoints).
          */
-        "alignSelfXl"?: AlignSelfs;
+        "alignSelfXl"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-small breakpoints).
          */
-        "alignSelfXs"?: AlignSelfs;
+        "alignSelfXs"?: GridItemAlignSelf;
+        /**
+          * Aligns the grid-item vertically in its container (grid) for extra-extra-large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-extra-large breakpoints).
+         */
+        "alignSelfXxl"?: GridItemAlignSelf;
         /**
           * Hides the grid-item in all display sizes.
          */
@@ -328,7 +543,7 @@ export namespace Components {
          */
         "hideMdUp"?: boolean;
         /**
-          * Hides the grid-item in small display sizes (smartphones).
+          * Hides the grid-item in small display sizes (landscape phones).
          */
         "hideSm"?: boolean;
         /**
@@ -340,91 +555,144 @@ export namespace Components {
          */
         "hideSmUp"?: boolean;
         /**
-          * Hides the grid-item in extra-large display sizes (wide desktop screen).
+          * Hides the grid-item in extra-large display sizes (large desktops).
          */
         "hideXl"?: boolean;
         /**
-          * Hides the grid-item in extra-small display sizes (mobile phones).
+          * Hides the grid-item in large and smaller display sizes.
+         */
+        "hideXlDown"?: boolean;
+        /**
+          * Hides the grid-item in large and larger display sizes.
+         */
+        "hideXlUp"?: boolean;
+        /**
+          * Hides the grid-item in extra-small display sizes (portrait phones).
          */
         "hideXs"?: boolean;
         /**
-          * Specifies the number of columns for large viewports (desktop). It also determines the number of columns for bigger display sizes when the upper breakpoint (xl) is not specified.
+          * Hides the grid-item in extra-extra-large display sizes (larger desktops).
          */
-        "lg"?: Columns;
+        "hideXxl"?: boolean;
         /**
-          * Specifies the number of columns for medium viewports (tablets). It also determines the number of columns for bigger display sizes when other upper breakpoints (lg and xl) are not specified.
+          * Hides the grid-item in large and smaller display sizes.
          */
-        "md"?: Columns;
+        "hideXxlDown"?: boolean;
+        /**
+          * Specifies the number of columns for large viewports (desktop). It also determines the number of columns for bigger display sizes when the upper breakpoint (xl and xxl) is not specified.
+         */
+        "lg"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for medium viewports (tablets). It also determines the number of columns for bigger display sizes when other upper breakpoints (lg, xl and xxl) are not specified.
+         */
+        "md"?: GridItemColumn;
         /**
           * Adds an offset space before the grid-item for large display sizes. It also applies to the larger breakpoint (xl) while that is not specified.
          */
-        "offsetLg"?: Offsets;
+        "offsetLg"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetMd"?: Offsets;
+        "offsetMd"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetSm"?: Offsets;
+        "offsetSm"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for extra-large display sizes.
          */
-        "offsetXl"?: Offsets;
+        "offsetXl"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetXs"?: Offsets;
+        "offsetXs"?: GridItemOffset;
+        /**
+          * Adds an offset space before the grid-item for extra-extra-large display sizes.
+         */
+        "offsetXxl"?: GridItemOffset;
         /**
           * Overrides the default order of the grid-item for large display sizes. It also applies to the larger breakpoint (xl) while that is not specified.
          */
-        "orderLg"?: Orders;
+        "orderLg"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderMd"?: Orders;
+        "orderMd"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderSm"?: Orders;
+        "orderSm"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for extra-large display sizes.
          */
-        "orderXl"?: Orders;
+        "orderXl"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderXs"?: Orders;
+        "orderXs"?: GridItemOrder;
         /**
-          * Specifies the number of columns for small viewports (smartphones). It also determines the number of columns for bigger display sizes when other upper breakpoints (md, lg, and xl) are not specified.
+          * Overrides the default order of the grid-item for extra-extra-large display sizes.
          */
-        "sm"?: Columns;
+        "orderXxl"?: GridItemOrder;
         /**
-          * Specifies the number of columns for extra-large viewports (wide desktop screen).
+          * Specifies the number of columns for small viewports (landscape phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (md, lg, xl and xxl) are not specified.
          */
-        "xl"?: Columns;
+        "sm"?: GridItemColumn;
         /**
-          * Specifies the number of columns for extra-small viewports (mobile phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (sm, md, lg, and xl) are not specified.
+          * Specifies the number of columns for large viewports (large desktops). It also determines the number of columns for bigger display sizes when the upper breakpoint (xxl) is not specified.
          */
-        "xs"?: Columns;
+        "xl"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for extra-small viewports (portrait phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (sm, md, lg, xl and xxl) are not specified.
+         */
+        "xs"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for extra-extra-large viewports (larger desktops).
+         */
+        "xxl"?: GridItemColumn;
     }
     interface PlusIntersection {
         /**
-          * TODO
+          * It specifies how intersection behaves with its children.
+          * @value normal - It doesn't have any effect on its children and the life cycles happen normally.
+          * @value appear - The children are removed from the first moment, and then they're brought back in when the element intersects with the viewport. In other words, the children are added to the DOM when the element intersects with the viewport and they are removed when the element leaves the viewport.
+          * @value blink  - The children are removed from the DOM when the element intersects with the viewport and are brought back in the DOM immediately. With that said, it affects the life cycles of its children.
+         */
+        "behavior"?: IntersectionBehavior;
+        /**
+          * Disables the intersection's trigger.
+         */
+        "disabled"?: boolean;
+        /**
+          * It causes the callback to be called just once for the first time.
          */
         "once"?: boolean;
         /**
-          * TODO
+          * The element that is used as the viewport for checking visibility of the target. Must be the ancestor of the target.  Defaults to the browser viewport if not specified or if null.
          */
         "root"?: Element;
         /**
-          * TODO
+          * Margin around the root. Can have values similar to the CSS [margin](https://developer.mozilla.org/en-US/docs/Web/CSS/margin) property, e.g.  "10px 20px 30px 40px" (top, right, bottom, left). The values can be percentages.  This set of values serves to grow or shrink each side of the root element's bounding box before computing intersections.  Defaults to all zeros.
          */
         "rootMargin"?: string;
         /**
-          * TODO
+          * Either a single number or an array of numbers which indicate at what percentage of the target's visibility the observer's callback should be executed.  If you only want to detect when visibility passes the 50% mark, you can use a value of 0.5.  If you want the callback to run every time visibility passes another 25%, you would specify the array [0, 0.25, 0.5, 0.75, 1].  The default is 0 (meaning as soon as even one pixel is visible, the callback will be run).  A value of 1.0 means that the threshold isn't considered passed until every pixel is visible.
          */
         "threshold"?: number | number[];
+    }
+    interface PlusLayout {
+        /**
+          * TODO
+         */
+        "bottom"?: LayoutBottom;
+        /**
+          * TODO
+         */
+        "main"?: LayoutMain;
+        /**
+          * TODO
+         */
+        "top"?: LayoutTop;
     }
     interface PlusMenu {
         /**
@@ -468,6 +736,8 @@ export namespace Components {
          */
         "trigger"?: 'click' | 'hover';
     }
+    interface PlusRipple {
+    }
     interface PlusSpinner {
         /**
           * Specifies the size of the spinner.
@@ -477,6 +747,24 @@ export namespace Components {
           * Specifies which variant of the spinner to use.
          */
         "type"?: SpinnerType;
+    }
+    interface PlusSticky {
+        /**
+          * Specifies the disable sticky mode.
+         */
+        "disabled"?: boolean;
+        /**
+          * Specifies the space from top.
+         */
+        "top"?: StickyTop;
+        /**
+          * If you use `state` property or `plusChange` event, you shold set this property to `true`.
+         */
+        "watcher"?: boolean;
+        /**
+          * Specifies the z-index of the sticky.
+         */
+        "zIndex"?: number;
     }
     interface PlusSwitch {
         /**
@@ -546,35 +834,77 @@ export namespace Components {
          */
         "value"?: string;
     }
-    interface PlusTransition {
+    interface PlusTemplate {
         /**
           * TODO
+         */
+        "disabled"?: boolean;
+    }
+    interface PlusToast {
+        /**
+          * TODO
+         */
+        "duration"?: number;
+        /**
+          * TODO
+         */
+        "fullWidth"?: boolean;
+        /**
+          * TODO
+         */
+        "open"?: boolean;
+        /**
+          * TODO
+         */
+        "persistent"?: boolean;
+        /**
+          * TODO
+         */
+        "placement"?: ToastPlacement;
+        /**
+          * TODO
+         */
+        "reverse"?: boolean;
+    }
+    interface PlusTooltip {
+        /**
+          * Tooltip disable.
+         */
+        "disabled"?: boolean;
+        /**
+          * Add fixed strategy to popper.
+         */
+        "fixed"?: boolean;
+        /**
+          * How to position the tooltip.
+         */
+        "placement"?: TooltipPlacement;
+        /**
+          * How tooltip is triggered, include click, hover, focus.
+         */
+        "trigger"?: TooltipTrigger;
+    }
+    interface PlusTransition {
+        /**
+          * Specifies the amount of delay before starting the animation to play.  This may be specified in either seconds `s` or milliseconds `ms`.
          */
         "delay"?: string;
         /**
-          * TODO
+          * Defines whether an animation should be played forwards, backwards or in alternate cycles.
          */
         "direction"?: TransitionDirection;
         /**
-          * TODO
+          * Specifies the length of time it will take to complete one cycle between two defined states. You can also use the reservation values `slower`, `slow`, `normal`, `fast` and `faster`.
          */
         "duration"?: TransitionDuration;
         /**
-          * TODO
+          * Specifies what kind of animation you want to play.  click [here](ROUTE:COMPONENT:TRANSITION:PROPERTY:NAME) to see the list of available animations.
          */
         "name": string;
         /**
-          * TODO
-         */
-        "pause"?: TransitionPause;
-        /**
-          * TODO
+          * Specifies the number of times the animation should be repeated after one complete cycle.
          */
         "repeat"?: TransitionRepeat;
-        /**
-          * TODO
-         */
-        "start"?: TransitionStart;
     }
     interface PlusTunnelConsumer {
         "context": { [key: string]: any };
@@ -588,6 +918,12 @@ declare global {
     var HTMLPlusAspectRatioElement: {
         prototype: HTMLPlusAspectRatioElement;
         new (): HTMLPlusAspectRatioElement;
+    };
+    interface HTMLPlusBreadcrumbElement extends Components.PlusBreadcrumb, HTMLStencilElement {
+    }
+    var HTMLPlusBreadcrumbElement: {
+        prototype: HTMLPlusBreadcrumbElement;
+        new (): HTMLPlusBreadcrumbElement;
     };
     interface HTMLPlusCardElement extends Components.PlusCard, HTMLStencilElement {
     }
@@ -612,6 +948,18 @@ declare global {
     var HTMLPlusCardHeaderElement: {
         prototype: HTMLPlusCardHeaderElement;
         new (): HTMLPlusCardHeaderElement;
+    };
+    interface HTMLPlusClickOutsideElement extends Components.PlusClickOutside, HTMLStencilElement {
+    }
+    var HTMLPlusClickOutsideElement: {
+        prototype: HTMLPlusClickOutsideElement;
+        new (): HTMLPlusClickOutsideElement;
+    };
+    interface HTMLPlusCropperElement extends Components.PlusCropper, HTMLStencilElement {
+    }
+    var HTMLPlusCropperElement: {
+        prototype: HTMLPlusCropperElement;
+        new (): HTMLPlusCropperElement;
     };
     interface HTMLPlusDialogElement extends Components.PlusDialog, HTMLStencilElement {
     }
@@ -649,6 +997,12 @@ declare global {
         prototype: HTMLPlusDialogTogglerElement;
         new (): HTMLPlusDialogTogglerElement;
     };
+    interface HTMLPlusDividerElement extends Components.PlusDivider, HTMLStencilElement {
+    }
+    var HTMLPlusDividerElement: {
+        prototype: HTMLPlusDividerElement;
+        new (): HTMLPlusDividerElement;
+    };
     interface HTMLPlusDrawerElement extends Components.PlusDrawer, HTMLStencilElement {
     }
     var HTMLPlusDrawerElement: {
@@ -679,17 +1033,35 @@ declare global {
         prototype: HTMLPlusIntersectionElement;
         new (): HTMLPlusIntersectionElement;
     };
+    interface HTMLPlusLayoutElement extends Components.PlusLayout, HTMLStencilElement {
+    }
+    var HTMLPlusLayoutElement: {
+        prototype: HTMLPlusLayoutElement;
+        new (): HTMLPlusLayoutElement;
+    };
     interface HTMLPlusMenuElement extends Components.PlusMenu, HTMLStencilElement {
     }
     var HTMLPlusMenuElement: {
         prototype: HTMLPlusMenuElement;
         new (): HTMLPlusMenuElement;
     };
+    interface HTMLPlusRippleElement extends Components.PlusRipple, HTMLStencilElement {
+    }
+    var HTMLPlusRippleElement: {
+        prototype: HTMLPlusRippleElement;
+        new (): HTMLPlusRippleElement;
+    };
     interface HTMLPlusSpinnerElement extends Components.PlusSpinner, HTMLStencilElement {
     }
     var HTMLPlusSpinnerElement: {
         prototype: HTMLPlusSpinnerElement;
         new (): HTMLPlusSpinnerElement;
+    };
+    interface HTMLPlusStickyElement extends Components.PlusSticky, HTMLStencilElement {
+    }
+    var HTMLPlusStickyElement: {
+        prototype: HTMLPlusStickyElement;
+        new (): HTMLPlusStickyElement;
     };
     interface HTMLPlusSwitchElement extends Components.PlusSwitch, HTMLStencilElement {
     }
@@ -727,6 +1099,24 @@ declare global {
         prototype: HTMLPlusTabsTabElement;
         new (): HTMLPlusTabsTabElement;
     };
+    interface HTMLPlusTemplateElement extends Components.PlusTemplate, HTMLStencilElement {
+    }
+    var HTMLPlusTemplateElement: {
+        prototype: HTMLPlusTemplateElement;
+        new (): HTMLPlusTemplateElement;
+    };
+    interface HTMLPlusToastElement extends Components.PlusToast, HTMLStencilElement {
+    }
+    var HTMLPlusToastElement: {
+        prototype: HTMLPlusToastElement;
+        new (): HTMLPlusToastElement;
+    };
+    interface HTMLPlusTooltipElement extends Components.PlusTooltip, HTMLStencilElement {
+    }
+    var HTMLPlusTooltipElement: {
+        prototype: HTMLPlusTooltipElement;
+        new (): HTMLPlusTooltipElement;
+    };
     interface HTMLPlusTransitionElement extends Components.PlusTransition, HTMLStencilElement {
     }
     var HTMLPlusTransitionElement: {
@@ -741,29 +1131,39 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "plus-aspect-ratio": HTMLPlusAspectRatioElement;
+        "plus-breadcrumb": HTMLPlusBreadcrumbElement;
         "plus-card": HTMLPlusCardElement;
         "plus-card-body": HTMLPlusCardBodyElement;
         "plus-card-footer": HTMLPlusCardFooterElement;
         "plus-card-header": HTMLPlusCardHeaderElement;
+        "plus-click-outside": HTMLPlusClickOutsideElement;
+        "plus-cropper": HTMLPlusCropperElement;
         "plus-dialog": HTMLPlusDialogElement;
         "plus-dialog-body": HTMLPlusDialogBodyElement;
         "plus-dialog-content": HTMLPlusDialogContentElement;
         "plus-dialog-footer": HTMLPlusDialogFooterElement;
         "plus-dialog-header": HTMLPlusDialogHeaderElement;
         "plus-dialog-toggler": HTMLPlusDialogTogglerElement;
+        "plus-divider": HTMLPlusDividerElement;
         "plus-drawer": HTMLPlusDrawerElement;
         "plus-drawer-toggler": HTMLPlusDrawerTogglerElement;
         "plus-grid": HTMLPlusGridElement;
         "plus-grid-item": HTMLPlusGridItemElement;
         "plus-intersection": HTMLPlusIntersectionElement;
+        "plus-layout": HTMLPlusLayoutElement;
         "plus-menu": HTMLPlusMenuElement;
+        "plus-ripple": HTMLPlusRippleElement;
         "plus-spinner": HTMLPlusSpinnerElement;
+        "plus-sticky": HTMLPlusStickyElement;
         "plus-switch": HTMLPlusSwitchElement;
         "plus-tabs": HTMLPlusTabsElement;
         "plus-tabs-bar": HTMLPlusTabsBarElement;
         "plus-tabs-panel": HTMLPlusTabsPanelElement;
         "plus-tabs-panels": HTMLPlusTabsPanelsElement;
         "plus-tabs-tab": HTMLPlusTabsTabElement;
+        "plus-template": HTMLPlusTemplateElement;
+        "plus-toast": HTMLPlusToastElement;
+        "plus-tooltip": HTMLPlusTooltipElement;
         "plus-transition": HTMLPlusTransitionElement;
         "plus-tunnel-consumer": HTMLPlusTunnelConsumerElement;
     }
@@ -773,11 +1173,41 @@ declare namespace LocalJSX {
         /**
           * Specifies the ratio.
          */
-        "value"?: number | string;
+        "value"?: AspectRatioValue;
+    }
+    interface PlusBreadcrumb {
+        /**
+          * TODO
+         */
+        "expanderText"?: string;
+        /**
+          * TODO
+         */
+        "max"?: number;
+        /**
+          * TODO
+         */
+        "offset"?: number;
+        /**
+          * TODO: Separator type is one of `none`, `circle`, `space`, `arrow`.
+         */
+        "separator"?: string;
     }
     interface PlusCard {
         /**
-          * TODO
+          * If you want the card to have shadow, use the elevation property,  And select the property value between `1` and `24`.
+         */
+        "elevation"?: CardElevation;
+        /**
+          * Use the flat property to neutralize elevation.
+         */
+        "flat"?: boolean;
+        /**
+          * If you want the card to have border, use the outlined property.
+         */
+        "outlined"?: boolean;
+        /**
+          * Use tile property to neutralize border-radius.
          */
         "tile"?: boolean;
     }
@@ -787,21 +1217,132 @@ declare namespace LocalJSX {
     }
     interface PlusCardHeader {
     }
-    interface PlusDialog {
+    interface PlusClickOutside {
         /**
-          * Activate the dialog’s backdrop to show or not.
+          * Disable the component.
+         */
+        "disabled"?: boolean;
+        /**
+          * Emitted when outside of the component is clicked.
+         */
+        "onPlusClickOutside"?: (event: CustomEvent<void>) => void;
+        /**
+          * The callback occurs only once.
+         */
+        "once"?: boolean;
+    }
+    interface PlusCropper {
+        /**
+          * A number between 0 and 1. Define the automatic cropping area size.
+         */
+        "area"?: number;
+        /**
+          * Defines the initial aspect ratio of the viewport.
+         */
+        "aspectRatio"?: number;
+        /**
+          * Shows the black modal above the image and under the viewport.
          */
         "backdrop"?: boolean;
         /**
-          * Used to connect dialog and dialog-action components. This property helps you to attach which dialog action controls the dialog. It doesn't matter where the dialog action is. You can put the dialog’s action inside or outside of the dialog. Read more about connectors here.
+          * Shows the grid background of the container.
+         */
+        "background"?: boolean;
+        /**
+          * Disables the cropper.
+         */
+        "disabled"?: boolean;
+        /**
+          * Shows the dashed lines above the viewport.
+         */
+        "guides"?: boolean;
+        /**
+          * Shows the center indicator above the viewport.
+         */
+        "indicator"?: boolean;
+        /**
+          * Defines the cropping mode of the cropper.
+          * @value crop - Creates a new viewport and allows you to move and resize it.
+          * @value move - moves the canvas and viewport.
+         */
+        "mode"?: CropperMode;
+        /**
+          * This event fires when the canvas or the viewport changed.
+         */
+        "onPlusCrop"?: (event: CustomEvent<void>) => void;
+        /**
+          * This event fires when the target image has been loaded and the cropper instance is ready for operating.
+         */
+        "onPlusReady"?: (event: CustomEvent<void>) => void;
+        /**
+          * This event fires when a cropper instance starts to zoom in or zoom out its canvas.
+         */
+        "onPlusZoom"?: (event: CustomEvent<CropperZoomData>) => void;
+        /**
+          * Enables to resize the viewport by dragging (Works when the value of the `mode` property is `crop`).
+          * @value main - Enables to resize the viewport by dragging on the Sides.
+          * @value edge - Enables to resize the viewport by dragging on the vertices.
+          * @value both - Enables to resize the viewport by dragging on the Sides and vertices.
+         */
+        "resizer"?: CropperResizer;
+        /**
+          * Specifies the shape of the resizer.
+         */
+        "resizerShape"?: CropperResizerShape;
+        /**
+          * Re-renders the cropper when resizing the window.
+          * @value reset - Restores the cropped area after resizing the window.
+         */
+        "responsive"?: CropperResponsive;
+        /**
+          * Specifies the shape of the viewport.
+         */
+        "shape"?: CropperShape;
+        /**
+          * Replace the image's src and rebuild the cropper.
+         */
+        "src"?: string;
+        /**
+          * The previous cropped data if you had stored, will be passed to value automatically when initialized.
+         */
+        "value"?: CropperValue;
+        /**
+          * Define the view mode of the cropper. If you set viewMode to `none`, the viewport can extend  outside the canvas, while a value of `fit`, `contain` or `cover` will restrict the viewport  to the size of the canvas. A viewMode of `contain` or `cover` will additionally restrict the  canvas to the container. Note that if the proportions of the canvas and the container are  the same, there is no difference between `contain` and `cover`.
+          * @value contain - restrict the minimum canvas size to fit within the container. If the            proportions of the canvas and the container differ, the minimum canvas will be            surrounded by extra space in one of the dimensions.
+          * @value cover   - restrict the minimum canvas size to fill fit the container. If the proportions            of the canvas and the container are different, the container will not be able            to fit the whole canvas in one of the dimensions.
+          * @value fit     - restrict the viewport to not exceed the size of the canvas.
+          * @value none    - no restrictions.
+         */
+        "view"?: CropperView;
+        /**
+          * Defines zoom ratio when zooming the image by wheeling mouse.
+         */
+        "zoomRatio"?: number;
+        /**
+          * Enables to zoom the image.
+          * @value false - Unable to zoom the image.
+          * @value true  - Enables to zoom the image by touching and wheeling mouse.
+          * @value touch - Enables to zoom the image by touching.
+          * @value wheel - Enables to zoom the image by wheeling mouse.
+          * @
+         */
+        "zoomable"?: CropperZoomable;
+    }
+    interface PlusDialog {
+        /**
+          * Activate the dialog's backdrop to show or not.
+         */
+        "backdrop"?: boolean;
+        /**
+          * This property helps you to attach which dialog toggler controls the dialog.  It doesn't matter where the dialog toggler is.  You can put the dialog's toggler inside or outside of the dialog.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
         /**
-          * Set the height of the dialog as much as the screen’s height.
+          * Set the height of the dialog as much as the screen's height.
          */
         "fullHeight"?: boolean;
         /**
-          * Set the width of the dialog as much as the screen’s width.
+          * Set the width of the dialog as much as the screen's width.
          */
         "fullWidth"?: boolean;
         /**
@@ -845,11 +1386,11 @@ declare namespace LocalJSX {
          */
         "scrollable"?: boolean;
         /**
-          * TODO
+          * Determine the width of the dialog.
          */
         "size"?: DialogSize;
         /**
-          * TODO
+          * Removes the margin around the dialog's content.
          */
         "sticky"?: boolean;
     }
@@ -871,29 +1412,39 @@ declare namespace LocalJSX {
     }
     interface PlusDialogToggler {
         /**
-          * TODO
+          * This property helps you to attach which dialog this toggler controls.  It doesn't matter where the dialog toggler is.  You can put the dialog's toggler inside or outside of the dialog.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
     }
+    interface PlusDivider {
+        /**
+          * You can use vertical property for vertical division.
+         */
+        "vertical"?: boolean;
+    }
     interface PlusDrawer {
         /**
-          * Activate the drawer’s backdrop to show or not.
+          * Activate the drawer's backdrop to show or not.
          */
         "backdrop"?: DrawerBackdrop;
         /**
-          * TODO
+          * Sets the mobile breakpoint to apply alternate styles for mobile devices when the breakpoint value is met.
          */
         "breakpoint"?: DrawerBreakpoint;
         /**
-          * TODO
+          * This property helps you to attach which drawer toggler controls the drawer.  It doesn't matter where the drawer toggler is.  You can put the drawer's toggler inside or outside of the drawer.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
         /**
-          * TODO
+          * It controls the flexibility of the drawer's width. If yes, the width of the drawer can be reduced. If false doesn't allow the width of the drawer to reduce.
+         */
+        "flexible"?: boolean;
+        /**
+          * Set the width of drawer to the minimum size you specified for the `mini-size` property.
          */
         "mini"?: boolean;
         /**
-          * TODO
+          * Sets the minimum width size of the drawer.
          */
         "miniSize"?: string;
         /**
@@ -917,29 +1468,25 @@ declare namespace LocalJSX {
          */
         "open"?: boolean;
         /**
-          * TODO
+          * If true, don't allow the drawer to be closed by clicking outside of the drawer. If false, the drawer will be closed by clicking outside of it.
          */
         "persistent"?: boolean;
         /**
-          * TODO
+          * Specifies where the drawer will open.
          */
         "placement"?: DrawerPlacement;
         /**
-          * TODO
-         */
-        "reverse"?: boolean;
-        /**
-          * TODO
+          * Determine the width of the drawer.
          */
         "size"?: string;
         /**
-          * TODO
+          * On default the drawer is considered as a part of the main container. it pushes the other contents on opening. If true it will be opened over other contents and doesn't affect other contents. A temporary drawer sits above its application and uses a backdrop to darken the background.
          */
-        "temporary"?: boolean;
+        "temporary"?: boolean | 'on-breakpoint';
     }
     interface PlusDrawerToggler {
         /**
-          * TODO
+          * This property helps you to attach which drawer this toggler controls.  It doesn't matter where the drawer toggler is.  You can put the drawer's toggler inside or outside of the drawer.  Read more about connectors [here](https://htmlplus.io/features/connector).
          */
         "connector"?: string;
     }
@@ -947,87 +1494,99 @@ declare namespace LocalJSX {
         /**
           * Aligns contents vertically across all rows (It overrides alignItems).
          */
-        "alignContent"?: AlignContents;
+        "alignContent"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for large display sizes (It overrides alignItemsLg).
          */
-        "alignContentLg"?: AlignContents;
+        "alignContentLg"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for medium display sizes (It overrides alignItemsMd).
          */
-        "alignContentMd"?: AlignContents;
+        "alignContentMd"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for small display sizes (It overrides alignItemsSm).
          */
-        "alignContentSm"?: AlignContents;
+        "alignContentSm"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for extra-large display sizes (It overrides alignItemsXl).
          */
-        "alignContentXl"?: AlignContents;
+        "alignContentXl"?: GridAlignContent;
         /**
           * Aligns contents vertically across all rows for extra-small display sizes (It overrides alignItemsXs).
          */
-        "alignContentXs"?: AlignContents;
+        "alignContentXs"?: GridAlignContent;
+        /**
+          * Aligns contents vertically across all rows for extra-extra-large display sizes (It overrides alignItemsXXl).
+         */
+        "alignContentXxl"?: GridAlignContent;
         /**
           * Aligns contents vertically inside their own row.
          */
-        "alignItems"?: AlignItems;
+        "alignItems"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for large display sizes.
          */
-        "alignItemsLg"?: AlignItems;
+        "alignItemsLg"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for medium display sizes.
          */
-        "alignItemsMd"?: AlignItems;
+        "alignItemsMd"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for small display sizes.
          */
-        "alignItemsSm"?: AlignItems;
+        "alignItemsSm"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for extra-large display sizes.
          */
-        "alignItemsXl"?: AlignItems;
+        "alignItemsXl"?: GridAlignItems;
         /**
           * Aligns contents vertically inside their own row for extra-small display sizes.
          */
-        "alignItemsXs"?: AlignItems;
+        "alignItemsXs"?: GridAlignItems;
+        /**
+          * Aligns contents vertically inside their own row for extra-extra-large display sizes.
+         */
+        "alignItemsXxl"?: GridAlignItems;
         /**
           * Adds a gap between contents to make space between them vertically and horizontally.
          */
-        "gutter"?: Gutters;
+        "gutter"?: GridGutter;
         /**
           * Adds a gap between contents to make space between them horizontally.
          */
-        "gutterX"?: Gutters;
+        "gutterX"?: GridGutter;
         /**
           * Adds a gap between contents to make space between them vertically.
          */
-        "gutterY"?: Gutters;
+        "gutterY"?: GridGutter;
         /**
           * Justifies contents horizontally.
          */
-        "justify"?: Justifies;
+        "justifyContent"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for large display sizes.
          */
-        "justifyLg"?: Justifies;
+        "justifyContentLg"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for medium display sizes.
          */
-        "justifyMd"?: Justifies;
+        "justifyContentMd"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for small display sizes.
          */
-        "justifySm"?: Justifies;
+        "justifyContentSm"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for extra-large display sizes.
          */
-        "justifyXl"?: Justifies;
+        "justifyContentXl"?: GridJustifyContent;
         /**
           * Justifies contents horizontally for extra-small display sizes.
          */
-        "justifyXs"?: Justifies;
+        "justifyContentXs"?: GridJustifyContent;
+        /**
+          * Justifies contents horizontally for extra-extra-large display sizes.
+         */
+        "justifyContentXxl"?: GridJustifyContent;
         /**
           * Reverses the flow of contents from left-to-right to right-to-left, or vice-versa.
          */
@@ -1039,53 +1598,61 @@ declare namespace LocalJSX {
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width.
          */
-        "wrap"?: Wraps;
+        "wrap"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for large screen devices.
          */
-        "wrapLg"?: Wraps;
+        "wrapLg"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for medium screen devices.
          */
-        "wrapMd"?: Wraps;
+        "wrapMd"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for small screen devices.
          */
-        "wrapSm"?: Wraps;
+        "wrapSm"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-large screen devices.
          */
-        "wrapXl"?: Wraps;
+        "wrapXl"?: GridWrap;
         /**
           * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-small screen devices.
          */
-        "wrapXs"?: Wraps;
+        "wrapXs"?: GridWrap;
+        /**
+          * Controls allowing the container to wrap the content or not if the cumulative width size of contents is more than the twelve-column width for extra-extra-large screen devices.
+         */
+        "wrapXxl"?: GridWrap;
     }
     interface PlusGridItem {
         /**
           * Aligns the grid-item vertically in its container (grid). It overrides the align-items property of its parent.
          */
-        "alignSelf"?: AlignSelfs;
+        "alignSelf"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for large breakpoints).
          */
-        "alignSelfLg"?: AlignSelfs;
+        "alignSelfLg"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for medium breakpoints).
          */
-        "alignSelfMd"?: AlignSelfs;
+        "alignSelfMd"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for small breakpoints).
          */
-        "alignSelfSm"?: AlignSelfs;
+        "alignSelfSm"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for extra-large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-large breakpoints).
          */
-        "alignSelfXl"?: AlignSelfs;
+        "alignSelfXl"?: GridItemAlignSelf;
         /**
           * Aligns the grid-item vertically in its container (grid) for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-small breakpoints).
          */
-        "alignSelfXs"?: AlignSelfs;
+        "alignSelfXs"?: GridItemAlignSelf;
+        /**
+          * Aligns the grid-item vertically in its container (grid) for extra-extra-large display sizes. It also applies to larger breakpoints and display sizes while they are not specified. (It overrides the align-items property of its parent just for extra-extra-large breakpoints).
+         */
+        "alignSelfXxl"?: GridItemAlignSelf;
         /**
           * Hides the grid-item in all display sizes.
          */
@@ -1115,7 +1682,7 @@ declare namespace LocalJSX {
          */
         "hideMdUp"?: boolean;
         /**
-          * Hides the grid-item in small display sizes (smartphones).
+          * Hides the grid-item in small display sizes (landscape phones).
          */
         "hideSm"?: boolean;
         /**
@@ -1127,95 +1694,148 @@ declare namespace LocalJSX {
          */
         "hideSmUp"?: boolean;
         /**
-          * Hides the grid-item in extra-large display sizes (wide desktop screen).
+          * Hides the grid-item in extra-large display sizes (large desktops).
          */
         "hideXl"?: boolean;
         /**
-          * Hides the grid-item in extra-small display sizes (mobile phones).
+          * Hides the grid-item in large and smaller display sizes.
+         */
+        "hideXlDown"?: boolean;
+        /**
+          * Hides the grid-item in large and larger display sizes.
+         */
+        "hideXlUp"?: boolean;
+        /**
+          * Hides the grid-item in extra-small display sizes (portrait phones).
          */
         "hideXs"?: boolean;
         /**
-          * Specifies the number of columns for large viewports (desktop). It also determines the number of columns for bigger display sizes when the upper breakpoint (xl) is not specified.
+          * Hides the grid-item in extra-extra-large display sizes (larger desktops).
          */
-        "lg"?: Columns;
+        "hideXxl"?: boolean;
         /**
-          * Specifies the number of columns for medium viewports (tablets). It also determines the number of columns for bigger display sizes when other upper breakpoints (lg and xl) are not specified.
+          * Hides the grid-item in large and smaller display sizes.
          */
-        "md"?: Columns;
+        "hideXxlDown"?: boolean;
+        /**
+          * Specifies the number of columns for large viewports (desktop). It also determines the number of columns for bigger display sizes when the upper breakpoint (xl and xxl) is not specified.
+         */
+        "lg"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for medium viewports (tablets). It also determines the number of columns for bigger display sizes when other upper breakpoints (lg, xl and xxl) are not specified.
+         */
+        "md"?: GridItemColumn;
         /**
           * Adds an offset space before the grid-item for large display sizes. It also applies to the larger breakpoint (xl) while that is not specified.
          */
-        "offsetLg"?: Offsets;
+        "offsetLg"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetMd"?: Offsets;
+        "offsetMd"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetSm"?: Offsets;
+        "offsetSm"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for extra-large display sizes.
          */
-        "offsetXl"?: Offsets;
+        "offsetXl"?: GridItemOffset;
         /**
           * Adds an offset space before the grid-item for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "offsetXs"?: Offsets;
+        "offsetXs"?: GridItemOffset;
+        /**
+          * Adds an offset space before the grid-item for extra-extra-large display sizes.
+         */
+        "offsetXxl"?: GridItemOffset;
         /**
           * Overrides the default order of the grid-item for large display sizes. It also applies to the larger breakpoint (xl) while that is not specified.
          */
-        "orderLg"?: Orders;
+        "orderLg"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for medium display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderMd"?: Orders;
+        "orderMd"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderSm"?: Orders;
+        "orderSm"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for extra-large display sizes.
          */
-        "orderXl"?: Orders;
+        "orderXl"?: GridItemOrder;
         /**
           * Overrides the default order of the grid-item for extra-small display sizes. It also applies to larger breakpoints and display sizes while they are not specified.
          */
-        "orderXs"?: Orders;
+        "orderXs"?: GridItemOrder;
         /**
-          * Specifies the number of columns for small viewports (smartphones). It also determines the number of columns for bigger display sizes when other upper breakpoints (md, lg, and xl) are not specified.
+          * Overrides the default order of the grid-item for extra-extra-large display sizes.
          */
-        "sm"?: Columns;
+        "orderXxl"?: GridItemOrder;
         /**
-          * Specifies the number of columns for extra-large viewports (wide desktop screen).
+          * Specifies the number of columns for small viewports (landscape phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (md, lg, xl and xxl) are not specified.
          */
-        "xl"?: Columns;
+        "sm"?: GridItemColumn;
         /**
-          * Specifies the number of columns for extra-small viewports (mobile phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (sm, md, lg, and xl) are not specified.
+          * Specifies the number of columns for large viewports (large desktops). It also determines the number of columns for bigger display sizes when the upper breakpoint (xxl) is not specified.
          */
-        "xs"?: Columns;
+        "xl"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for extra-small viewports (portrait phones). It also determines the number of columns for bigger display sizes when other upper breakpoints (sm, md, lg, xl and xxl) are not specified.
+         */
+        "xs"?: GridItemColumn;
+        /**
+          * Specifies the number of columns for extra-extra-large viewports (larger desktops).
+         */
+        "xxl"?: GridItemColumn;
     }
     interface PlusIntersection {
         /**
-          * TODO
+          * It specifies how intersection behaves with its children.
+          * @value normal - It doesn't have any effect on its children and the life cycles happen normally.
+          * @value appear - The children are removed from the first moment, and then they're brought back in when the element intersects with the viewport. In other words, the children are added to the DOM when the element intersects with the viewport and they are removed when the element leaves the viewport.
+          * @value blink  - The children are removed from the DOM when the element intersects with the viewport and are brought back in the DOM immediately. With that said, it affects the life cycles of its children.
+         */
+        "behavior"?: IntersectionBehavior;
+        /**
+          * Disables the intersection's trigger.
+         */
+        "disabled"?: boolean;
+        /**
+          * This event is triggered when its children intersects with the viewport in either coming to the viewport or going out of it.
          */
         "onPlusChange"?: (event: CustomEvent<IntersectionObserverEntry>) => void;
         /**
-          * TODO
+          * It causes the callback to be called just once for the first time.
          */
         "once"?: boolean;
         /**
-          * TODO
+          * The element that is used as the viewport for checking visibility of the target. Must be the ancestor of the target.  Defaults to the browser viewport if not specified or if null.
          */
         "root"?: Element;
         /**
-          * TODO
+          * Margin around the root. Can have values similar to the CSS [margin](https://developer.mozilla.org/en-US/docs/Web/CSS/margin) property, e.g.  "10px 20px 30px 40px" (top, right, bottom, left). The values can be percentages.  This set of values serves to grow or shrink each side of the root element's bounding box before computing intersections.  Defaults to all zeros.
          */
         "rootMargin"?: string;
         /**
-          * TODO
+          * Either a single number or an array of numbers which indicate at what percentage of the target's visibility the observer's callback should be executed.  If you only want to detect when visibility passes the 50% mark, you can use a value of 0.5.  If you want the callback to run every time visibility passes another 25%, you would specify the array [0, 0.25, 0.5, 0.75, 1].  The default is 0 (meaning as soon as even one pixel is visible, the callback will be run).  A value of 1.0 means that the threshold isn't considered passed until every pixel is visible.
          */
         "threshold"?: number | number[];
+    }
+    interface PlusLayout {
+        /**
+          * TODO
+         */
+        "bottom"?: LayoutBottom;
+        /**
+          * TODO
+         */
+        "main"?: LayoutMain;
+        /**
+          * TODO
+         */
+        "top"?: LayoutTop;
     }
     interface PlusMenu {
         /**
@@ -1249,7 +1869,7 @@ declare namespace LocalJSX {
         /**
           * TODO
          */
-        "onPlusClose"?: (event: CustomEvent<any>) => void;
+        "onPlusClose"?: (event: CustomEvent<void>) => void;
         /**
           * TODO
          */
@@ -1263,6 +1883,8 @@ declare namespace LocalJSX {
          */
         "trigger"?: 'click' | 'hover';
     }
+    interface PlusRipple {
+    }
     interface PlusSpinner {
         /**
           * Specifies the size of the spinner.
@@ -1272,6 +1894,28 @@ declare namespace LocalJSX {
           * Specifies which variant of the spinner to use.
          */
         "type"?: SpinnerType;
+    }
+    interface PlusSticky {
+        /**
+          * Specifies the disable sticky mode.
+         */
+        "disabled"?: boolean;
+        /**
+          * When the component state is changed this event triggers.  To enable this event you shold set `watcher` property to `true`.
+         */
+        "onPlusChange"?: (event: CustomEvent<StickyState>) => void;
+        /**
+          * Specifies the space from top.
+         */
+        "top"?: StickyTop;
+        /**
+          * If you use `state` property or `plusChange` event, you shold set this property to `true`.
+         */
+        "watcher"?: boolean;
+        /**
+          * Specifies the z-index of the sticky.
+         */
+        "zIndex"?: number;
     }
     interface PlusSwitch {
         /**
@@ -1303,7 +1947,7 @@ declare namespace LocalJSX {
         /**
           * TODO
          */
-        "onWowChange"?: (event: CustomEvent<any>) => void;
+        "onWowChange"?: (event: CustomEvent<string>) => void;
         /**
           * TODO
          */
@@ -1349,51 +1993,109 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
-    interface PlusTransition {
+    interface PlusTemplate {
         /**
           * TODO
+         */
+        "disabled"?: boolean;
+    }
+    interface PlusToast {
+        /**
+          * TODO
+         */
+        "duration"?: number;
+        /**
+          * TODO
+         */
+        "fullWidth"?: boolean;
+        /**
+          * TODO
+         */
+        "onPlusClose"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusClosed"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusOpen"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusOpened"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "open"?: boolean;
+        /**
+          * TODO
+         */
+        "persistent"?: boolean;
+        /**
+          * TODO
+         */
+        "placement"?: ToastPlacement;
+        /**
+          * TODO
+         */
+        "reverse"?: boolean;
+    }
+    interface PlusTooltip {
+        /**
+          * Tooltip disable.
+         */
+        "disabled"?: boolean;
+        /**
+          * Add fixed strategy to popper.
+         */
+        "fixed"?: boolean;
+        /**
+          * How to position the tooltip.
+         */
+        "placement"?: TooltipPlacement;
+        /**
+          * How tooltip is triggered, include click, hover, focus.
+         */
+        "trigger"?: TooltipTrigger;
+    }
+    interface PlusTransition {
+        /**
+          * Specifies the amount of delay before starting the animation to play.  This may be specified in either seconds `s` or milliseconds `ms`.
          */
         "delay"?: string;
         /**
-          * TODO
+          * Defines whether an animation should be played forwards, backwards or in alternate cycles.
          */
         "direction"?: TransitionDirection;
         /**
-          * TODO
+          * Specifies the length of time it will take to complete one cycle between two defined states. You can also use the reservation values `slower`, `slow`, `normal`, `fast` and `faster`.
          */
         "duration"?: TransitionDuration;
         /**
-          * TODO
+          * Specifies what kind of animation you want to play.  click [here](ROUTE:COMPONENT:TRANSITION:PROPERTY:NAME) to see the list of available animations.
          */
         "name"?: string;
         /**
-          * TODO
+          * This event is fired any time the animation has been canceled.
          */
-        "onPlusCancel"?: (event: CustomEvent<any>) => void;
+        "onPlusCancel"?: (event: CustomEvent<void>) => void;
         /**
-          * TODO
+          * This event is fired when animation has been completed.
          */
-        "onPlusEnd"?: (event: CustomEvent<any>) => void;
+        "onPlusEnd"?: (event: CustomEvent<void>) => void;
         /**
-          * TODO
+          * This event is fired any time a new cycle has been started.
          */
-        "onPlusIteration"?: (event: CustomEvent<any>) => void;
+        "onPlusIteration"?: (event: CustomEvent<void>) => void;
         /**
-          * TODO
+          * This event is fired when animation has been started.
          */
-        "onPlusStart"?: (event: CustomEvent<any>) => void;
+        "onPlusStart"?: (event: CustomEvent<void>) => void;
         /**
-          * TODO
-         */
-        "pause"?: TransitionPause;
-        /**
-          * TODO
+          * Specifies the number of times the animation should be repeated after one complete cycle.
          */
         "repeat"?: TransitionRepeat;
-        /**
-          * TODO
-         */
-        "start"?: TransitionStart;
     }
     interface PlusTunnelConsumer {
         "context"?: { [key: string]: any };
@@ -1402,29 +2104,39 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "plus-aspect-ratio": PlusAspectRatio;
+        "plus-breadcrumb": PlusBreadcrumb;
         "plus-card": PlusCard;
         "plus-card-body": PlusCardBody;
         "plus-card-footer": PlusCardFooter;
         "plus-card-header": PlusCardHeader;
+        "plus-click-outside": PlusClickOutside;
+        "plus-cropper": PlusCropper;
         "plus-dialog": PlusDialog;
         "plus-dialog-body": PlusDialogBody;
         "plus-dialog-content": PlusDialogContent;
         "plus-dialog-footer": PlusDialogFooter;
         "plus-dialog-header": PlusDialogHeader;
         "plus-dialog-toggler": PlusDialogToggler;
+        "plus-divider": PlusDivider;
         "plus-drawer": PlusDrawer;
         "plus-drawer-toggler": PlusDrawerToggler;
         "plus-grid": PlusGrid;
         "plus-grid-item": PlusGridItem;
         "plus-intersection": PlusIntersection;
+        "plus-layout": PlusLayout;
         "plus-menu": PlusMenu;
+        "plus-ripple": PlusRipple;
         "plus-spinner": PlusSpinner;
+        "plus-sticky": PlusSticky;
         "plus-switch": PlusSwitch;
         "plus-tabs": PlusTabs;
         "plus-tabs-bar": PlusTabsBar;
         "plus-tabs-panel": PlusTabsPanel;
         "plus-tabs-panels": PlusTabsPanels;
         "plus-tabs-tab": PlusTabsTab;
+        "plus-template": PlusTemplate;
+        "plus-toast": PlusToast;
+        "plus-tooltip": PlusTooltip;
         "plus-transition": PlusTransition;
         "plus-tunnel-consumer": PlusTunnelConsumer;
     }
@@ -1434,29 +2146,39 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "plus-aspect-ratio": LocalJSX.PlusAspectRatio & JSXBase.HTMLAttributes<HTMLPlusAspectRatioElement>;
+            "plus-breadcrumb": LocalJSX.PlusBreadcrumb & JSXBase.HTMLAttributes<HTMLPlusBreadcrumbElement>;
             "plus-card": LocalJSX.PlusCard & JSXBase.HTMLAttributes<HTMLPlusCardElement>;
             "plus-card-body": LocalJSX.PlusCardBody & JSXBase.HTMLAttributes<HTMLPlusCardBodyElement>;
             "plus-card-footer": LocalJSX.PlusCardFooter & JSXBase.HTMLAttributes<HTMLPlusCardFooterElement>;
             "plus-card-header": LocalJSX.PlusCardHeader & JSXBase.HTMLAttributes<HTMLPlusCardHeaderElement>;
+            "plus-click-outside": LocalJSX.PlusClickOutside & JSXBase.HTMLAttributes<HTMLPlusClickOutsideElement>;
+            "plus-cropper": LocalJSX.PlusCropper & JSXBase.HTMLAttributes<HTMLPlusCropperElement>;
             "plus-dialog": LocalJSX.PlusDialog & JSXBase.HTMLAttributes<HTMLPlusDialogElement>;
             "plus-dialog-body": LocalJSX.PlusDialogBody & JSXBase.HTMLAttributes<HTMLPlusDialogBodyElement>;
             "plus-dialog-content": LocalJSX.PlusDialogContent & JSXBase.HTMLAttributes<HTMLPlusDialogContentElement>;
             "plus-dialog-footer": LocalJSX.PlusDialogFooter & JSXBase.HTMLAttributes<HTMLPlusDialogFooterElement>;
             "plus-dialog-header": LocalJSX.PlusDialogHeader & JSXBase.HTMLAttributes<HTMLPlusDialogHeaderElement>;
             "plus-dialog-toggler": LocalJSX.PlusDialogToggler & JSXBase.HTMLAttributes<HTMLPlusDialogTogglerElement>;
+            "plus-divider": LocalJSX.PlusDivider & JSXBase.HTMLAttributes<HTMLPlusDividerElement>;
             "plus-drawer": LocalJSX.PlusDrawer & JSXBase.HTMLAttributes<HTMLPlusDrawerElement>;
             "plus-drawer-toggler": LocalJSX.PlusDrawerToggler & JSXBase.HTMLAttributes<HTMLPlusDrawerTogglerElement>;
             "plus-grid": LocalJSX.PlusGrid & JSXBase.HTMLAttributes<HTMLPlusGridElement>;
             "plus-grid-item": LocalJSX.PlusGridItem & JSXBase.HTMLAttributes<HTMLPlusGridItemElement>;
             "plus-intersection": LocalJSX.PlusIntersection & JSXBase.HTMLAttributes<HTMLPlusIntersectionElement>;
+            "plus-layout": LocalJSX.PlusLayout & JSXBase.HTMLAttributes<HTMLPlusLayoutElement>;
             "plus-menu": LocalJSX.PlusMenu & JSXBase.HTMLAttributes<HTMLPlusMenuElement>;
+            "plus-ripple": LocalJSX.PlusRipple & JSXBase.HTMLAttributes<HTMLPlusRippleElement>;
             "plus-spinner": LocalJSX.PlusSpinner & JSXBase.HTMLAttributes<HTMLPlusSpinnerElement>;
+            "plus-sticky": LocalJSX.PlusSticky & JSXBase.HTMLAttributes<HTMLPlusStickyElement>;
             "plus-switch": LocalJSX.PlusSwitch & JSXBase.HTMLAttributes<HTMLPlusSwitchElement>;
             "plus-tabs": LocalJSX.PlusTabs & JSXBase.HTMLAttributes<HTMLPlusTabsElement>;
             "plus-tabs-bar": LocalJSX.PlusTabsBar & JSXBase.HTMLAttributes<HTMLPlusTabsBarElement>;
             "plus-tabs-panel": LocalJSX.PlusTabsPanel & JSXBase.HTMLAttributes<HTMLPlusTabsPanelElement>;
             "plus-tabs-panels": LocalJSX.PlusTabsPanels & JSXBase.HTMLAttributes<HTMLPlusTabsPanelsElement>;
             "plus-tabs-tab": LocalJSX.PlusTabsTab & JSXBase.HTMLAttributes<HTMLPlusTabsTabElement>;
+            "plus-template": LocalJSX.PlusTemplate & JSXBase.HTMLAttributes<HTMLPlusTemplateElement>;
+            "plus-toast": LocalJSX.PlusToast & JSXBase.HTMLAttributes<HTMLPlusToastElement>;
+            "plus-tooltip": LocalJSX.PlusTooltip & JSXBase.HTMLAttributes<HTMLPlusTooltipElement>;
             "plus-transition": LocalJSX.PlusTransition & JSXBase.HTMLAttributes<HTMLPlusTransitionElement>;
             "plus-tunnel-consumer": LocalJSX.PlusTunnelConsumer & JSXBase.HTMLAttributes<HTMLPlusTunnelConsumerElement>;
         }

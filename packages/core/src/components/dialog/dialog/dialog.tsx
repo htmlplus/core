@@ -1,14 +1,14 @@
 import { Component, Element, Event, EventEmitter, Host, Prop, Watch, h } from '@stencil/core';
-import { Animation, Bind, GlobalConfig, GlobalState, OutsideClick, Scrollbar } from '@app/services';
+import { Animation, Bind, ClickOutside, GlobalConfig, GlobalState, Scrollbar } from '@app/services';
 import * as Utils from '@app/utils';
 import { DialogLink, Inject, rebind } from './dialog.link';
-import { DialogFullscreen, DialogGlobalState, DialogPlacement, DialogPlacementMap, DialogSize } from './dialog.types';
+import { DialogFullscreen, DialogGlobalState, DialogPlacement, DialogSize } from './dialog.types';
 
 /**
  * A dialog is a `conversation` between the system and the user. It is prompted when the system needs input from the user or to give the user urgent information concerning their current workflow.
  * @group dialog
  * @slot - The default slot
- * @examples default, animation, persistent, placement, size, backdrop, scrollable, specific-scrollable, fullscreen, full-width, full-height, sticky, nesting
+ * @examples default, animation, persistent, placement, size, backdrop, scrollable, specific-scrollable, fullscreen, full-width, full-height, sticky, nesting, prevent
  */
 @Component({
   tag: 'plus-dialog',
@@ -18,29 +18,28 @@ import { DialogFullscreen, DialogGlobalState, DialogPlacement, DialogPlacementMa
 export class Dialog {
 
   /**
-   * Activate the dialog’s backdrop to show or not.
+   * Activate the dialog's backdrop to show or not.
    */
   @Prop()
   backdrop?: boolean = true;
 
   /**
-   * Used to connect dialog and dialog-action components.
-   * This property helps you to attach which dialog action controls the dialog.
-   * It doesn't matter where the dialog action is.
-   * You can put the dialog’s action inside or outside of the dialog.
-   * Read more about connectors here.
+   * This property helps you to attach which dialog toggler controls the dialog. 
+   * It doesn't matter where the dialog toggler is. 
+   * You can put the dialog's toggler inside or outside of the dialog. 
+   * Read more about connectors [here](https://htmlplus.io/features/connector).
    */
   @Prop()
   connector?: string;
 
   /**
-   * Set the height of the dialog as much as the screen’s height.
+   * Set the height of the dialog as much as the screen's height.
    */
   @Prop()
   fullHeight?: boolean;
 
   /**
-   * Set the width of the dialog as much as the screen’s width.
+   * Set the width of the dialog as much as the screen's width.
    */
   @Prop()
   fullWidth?: boolean;
@@ -83,13 +82,13 @@ export class Dialog {
   scrollable?: boolean;
 
   /**
-   * TODO
+   * Determine the width of the dialog.
    */
   @Prop()
   size?: DialogSize;
 
   /**
-   * TODO
+   * Removes the margin around the dialog's content.
    */
   @Prop()
   sticky?: boolean;
@@ -139,7 +138,7 @@ export class Dialog {
 
   @GlobalState()
   state: DialogGlobalState = {
-    instances: new Set<any>()
+    instances: []
   };
 
   @Element()
@@ -154,9 +153,34 @@ export class Dialog {
     toggle: () => this.tryToggle()
   };
 
+  get attributes() {
+
+    const attributes = {
+      'tabindex': -1
+    }
+
+    if (this.open) {
+      attributes['role'] = 'dialog';
+      attributes['aria-modal'] = 'true';
+    }
+    else {
+      attributes['aria-hidden'] = 'true';
+    }
+
+    return attributes;
+  }
+
   get classes() {
 
-    let [x, y] = (DialogPlacementMap[this.placement] || '').split('-');
+    let placement = (this.placement || '');
+
+    if (placement.match(/^(top|bottom)$/)) placement = `-${placement}`;
+
+    let [x, y] = placement.split('-');
+
+    x = x || 'center';
+
+    y = y || 'center';
 
     x = Utils.toAxis(x, this.isRTL);
 
@@ -177,7 +201,7 @@ export class Dialog {
 
   get isCurrent() {
 
-    const instances = Array.from(this.state.instances);
+    const instances = this.state.instances;
 
     const last = instances.length - 1;
 
@@ -193,35 +217,8 @@ export class Dialog {
   }
 
   /**
-   * Methods
+   * Internal Methods
    */
-
-  @Watch('connector')
-  connectorWatcher() {
-    rebind(this);
-  }
-
-  @Watch('open')
-  openWatcher() {
-
-    if (this.open) {
-
-      if (this.isOpen) return;
-
-      this.animation.enter({
-        onEnter: () => this.show()
-      })
-    }
-    else {
-
-      if (!this.isOpen) return;
-
-      this.animation.leave({
-        onLeave: () => this.broadcast(false),
-        onLeaved: () => this.hide(),
-      })
-    }
-  }
 
   broadcast(value) {
     this.link.open = value;
@@ -237,13 +234,12 @@ export class Dialog {
 
   hide() {
 
-    this.resetAttributes();
     this.resetEvents();
-    OutsideClick.remove(this.$cell);
+    ClickOutside.remove(this.$cell);
     Scrollbar.reset(this);
     this.resetZIndex();
 
-    this.state.instances.delete(this);
+    this.state.instances = this.state.instances.filter((instance) => instance !== this);
 
     this.$host.classList.remove('open');
 
@@ -254,13 +250,12 @@ export class Dialog {
 
   show() {
 
-    this.setAttributes();
     this.setEvents();
-    OutsideClick.add(this.$cell, this.onOutsideClick);
+    ClickOutside.add(this.$cell, this.onOutsideClick, false);
     Scrollbar.remove(this);
     this.setZIndex();
 
-    this.state.instances.add(this);
+    this.state.instances.push(this);
 
     this.$host.classList.add('open');
 
@@ -311,29 +306,13 @@ export class Dialog {
     this.animation?.dispose();
 
     this.resetEvents();
-    OutsideClick.remove(this.$cell);
+    ClickOutside.remove(this.$cell);
     Scrollbar.reset(this);
-    this.state.instances.delete(this);
+    this.state.instances = this.state.instances.filter((instance) => instance !== this);
   }
 
   /**
-   * Attributes
-   */
-
-  setAttributes() {
-    this.$host.removeAttribute('aria-hidden');
-    this.$host.setAttribute('aria-modal', 'true');
-    this.$host.setAttribute('role', 'dialog');
-  }
-
-  resetAttributes() {
-    this.$host.setAttribute('aria-hidden', 'true');
-    this.$host.removeAttribute('aria-modal');
-    this.$host.removeAttribute('role');
-  }
-
-  /**
-   * Events
+   * Internal Methods / Events
    */
 
   setEvents() {
@@ -345,12 +324,12 @@ export class Dialog {
   }
 
   /**
-   * z-index
+   * Internal Methods / z-index
    */
 
   setZIndex() {
 
-    const instance = Array.from(this.state.instances).slice(-1)[0];
+    const [instance] = this.state.instances.slice(-1);
 
     if (!instance) return;
 
@@ -361,6 +340,37 @@ export class Dialog {
 
   resetZIndex() {
     this.$host.style.zIndex = null;
+  }
+
+  /**
+  * Watchers
+  */
+
+  @Watch('connector')
+  connectorWatcher() {
+    rebind(this);
+  }
+
+  @Watch('open')
+  openWatcher() {
+
+    if (this.open) {
+
+      if (this.isOpen) return;
+
+      this.animation.enter({
+        onEnter: () => this.show()
+      })
+    }
+    else {
+
+      if (!this.isOpen) return;
+
+      this.animation.leave({
+        onLeave: () => this.broadcast(false),
+        onLeaved: () => this.hide(),
+      })
+    }
   }
 
   /**
@@ -381,6 +391,9 @@ export class Dialog {
 
   @Bind
   onOutsideClick() {
+
+    if (!this.isOpen || !this.isCurrent) return;
+
     this.tryToHide();
   }
 
@@ -401,7 +414,7 @@ export class Dialog {
 
   render() {
     return (
-      <Host aria-hidden="true" tabindex="-1">
+      <Host {...this.attributes}>
         {this.backdrop && (<div class="backdrop"><div /></div>)}
         <div class={this.classes}>
           <div class="table">

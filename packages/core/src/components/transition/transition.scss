@@ -1,8 +1,8 @@
 @import 'transition.variables';
-@import 'animations/index';
 
 :host {
     --plus-transition-delay: 0s;
+    --plus-transition-direction: normal;
     --plus-transition-duration: 1s;
     --plus-transition-repeat: 1;
 }
@@ -11,6 +11,7 @@
     display: block;
     animation-fill-mode: both;
     animation-delay: var(--plus-transition-delay);
+    animation-direction: var(--plus-transition-direction);
     animation-duration: var(--plus-transition-duration);
     animation-iteration-count: var(--plus-transition-repeat);
 }
@@ -41,3 +42,32 @@
         --plus-transition-direction: #{$value};
     }
 }
+
+:host([name='fade-in']) {
+    animation-name: fade-in;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+:host([name='fade-out']) {
+    animation-name: fade-out;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+  

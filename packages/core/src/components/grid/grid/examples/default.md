@@ -1,9 +1,8 @@
-TODO: no border, padding (used in gutter), margin (offset) on grid-item
-
 ```css [style]
-.box {
-  border: 1px solid #ccc;
-  background-color: #eee;
+div {
+  color: #00BCD4;
+  border: 1px solid #FFFFFF;
+  background-color: #E0F7FA;
   padding: 0.5em;
   text-align: center;
 }
@@ -12,17 +11,17 @@ TODO: no border, padding (used in gutter), margin (offset) on grid-item
 ```html [template]
 <plus-grid>
   <plus-grid-item xs="12" md="4">
-    <div class="box">
+    <div>
       xs=12, md=4
     </div>
   </plus-grid-item>
   <plus-grid-item xs="12" md="4">
-    <div class="box">
+    <div>
       xs=12, md=4
     </div>
   </plus-grid-item>
   <plus-grid-item xs="12" md="4">
-    <div class="box">
+    <div>
       xs=12, md=4
     </div>
   </plus-grid-item>

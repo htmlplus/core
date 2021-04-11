@@ -40,7 +40,7 @@ export class Tabs {
     bubbles: false,
     cancelable: true
   })
-  wowChange!: EventEmitter;
+  wowChange!: EventEmitter<string>;
 
   get state(): TabsTunnelState {
     return {

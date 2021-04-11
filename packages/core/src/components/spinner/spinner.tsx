@@ -1,10 +1,10 @@
 import { Component, Host, Prop, h } from '@stencil/core';
+import { GlobalConfig } from '@app/services';
 import { SpinnerSize, SpinnerType } from './spinner.types';
 
 /**
- * TODO
- * @internal
- * @examples default, type, size, color
+ * It's an indicator of progress and activity in order to show the loading state of a component or page when the user needs to wait on.
+ * @examples default, size, custom-size, color, type, customize
  */
 @Component({
   tag: 'plus-spinner',
@@ -25,31 +25,38 @@ export class Spinner {
   @Prop({ reflect: true })
   type?: SpinnerType = 'default';
 
+  @GlobalConfig('spinner', {
+    size: 'md',
+    type: 'default'
+  })
+  config?;
+
+  get attributes() {
+    return {
+      'role': 'status',
+      // TODO 'aria-hidden': true
+    }
+  }
+
   get elements() {
 
-    let number = 0;
+    const map = {
+      'default': 8,
+      'double-bounce': 2
+    };
 
-    switch (this.type) {
-
-      case 'default':
-        number = 8;
-        break;
-
-      case 'double-bounce':
-        number = 2;
-        break;
-    }
+    const number = map[this.type] ?? 1;
 
     return Array.from(Array(number).keys());
   }
 
   render() {
     return (
-      <Host>
+      <Host {...this.attributes}>
         <div class="wrapper">
           {this.elements.map((element) => <div key={element} />)}
         </div>
       </Host>
-    );
+    )
   }
 }
