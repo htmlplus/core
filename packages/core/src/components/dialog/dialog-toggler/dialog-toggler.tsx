@@ -1,11 +1,11 @@
 import { Component, Host, Prop, Watch, h } from '@stencil/core';
-import { DialogLink, Inject, rebind } from '../dialog/dialog.link';
+import { DialogLink, Link, rebind } from '../dialog/dialog.link';
 
 /**
  * @group dialog
- * @slot - The default slot
- * @slot open - Specifies the content of toggler when it's opened
- * @slot close - Specifies the content of toggler when it's closed
+ * @slot default - The default slot.
+ * @slot open    - Specifies the content of toggler when it's opened.
+ * @slot close   - Specifies the content of toggler when it's closed.
  */
 @Component({
   tag: 'plus-dialog-toggler',
@@ -23,7 +23,7 @@ export class DialogToggler {
   @Prop()
   connector?: string;
 
-  @Inject({ scope: '[connector]' })
+  @Link({ scope: '[connector]' })
   link!: DialogLink;
 
   @Watch('connector')

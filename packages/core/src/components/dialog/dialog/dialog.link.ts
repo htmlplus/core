@@ -1,4 +1,4 @@
-import { createLink } from '@app/services';
+import { createLink } from '@app/utils';
 
 export interface DialogLink {
     open?: boolean;
@@ -10,4 +10,4 @@ const initial = {
     toggle: () => undefined
 };
 
-export const { Inject, rebind } = createLink<DialogLink>(initial);
+export const { Link, rebind } = createLink<DialogLink>(initial);

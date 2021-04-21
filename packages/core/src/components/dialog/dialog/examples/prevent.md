@@ -1,5 +1,5 @@
 ```css [style]
-div {
+.center {
   text-align: center;
 }
 ```
@@ -9,7 +9,7 @@ class {
 
   ensure(type, event) {
     
-    if(confirm(`Are you sure you want to ${type} it?`)) return;
+    if(window.confirm(`Are you sure you want to ${type} it?`)) return;
 
     event.preventDefault();
   }
@@ -17,7 +17,7 @@ class {
   render() {
     return (
       <fragment>
-        <div>
+        <div class="center">
           <plus-dialog-toggler connector="dialog-prevent">
             Open
           </plus-dialog-toggler>
@@ -36,7 +36,7 @@ class {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </plus-dialog-body>
             <plus-dialog-footer>
-              <plus-dialog-toggler connector="dialog-prevent">
+              <plus-dialog-toggler>
                 Close
               </plus-dialog-toggler>
             </plus-dialog-footer>
@@ -49,7 +49,7 @@ class {
 ```
 
 ```html [javascript:template]
-<div>
+<div class="center">
   <plus-dialog-toggler connector="dialog-prevent">
     Open
   </plus-dialog-toggler>
@@ -65,7 +65,7 @@ class {
       consequat.
     </plus-dialog-body>
     <plus-dialog-footer>
-      <plus-dialog-toggler connector="dialog-prevent">
+      <plus-dialog-toggler>
         Close
       </plus-dialog-toggler>
     </plus-dialog-footer>
@@ -76,7 +76,7 @@ class {
 ```js [javascript:script]
 const ensure = (type, event) => {
 
-  if (confirm(`Are you sure you want to ${type} it?`)) return;
+  if (window.confirm(`Are you sure you want to ${type} it?`)) return;
 
   event.preventDefault();
 }

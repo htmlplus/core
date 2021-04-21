@@ -7,25 +7,43 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AspectRatioValue } from "./components/aspect-ratio/aspect-ratio.types";
 import { CardElevation } from "./components/card/card/card.types";
-import { CropperAspectRatio, CropperMode, CropperResizer, CropperResizerShape, CropperResponsive, CropperValue, CropperView, CropperViewport, CropperViewportShape, CropperZoomable, CropperZoomData } from "./components/cropper/cropper.types";
+import { CropperMode, CropperResizer, CropperResizerShape, CropperResponsive, CropperShape, CropperValue, CropperView, CropperZoomable, CropperZoomData } from "./components/cropper/cropper.types";
 import { DialogFullscreen, DialogPlacement, DialogSize } from "./components/dialog/dialog/dialog.types";
 import { DrawerBackdrop, DrawerBreakpoint, DrawerPlacement } from "./components/drawer/drawer/drawer.types";
 import { GridAlignContent, GridAlignItems, GridGutter, GridJustifyContent, GridWrap } from "./components/grid/grid/grid.types";
 import { GridItemAlignSelf, GridItemColumn, GridItemOffset, GridItemOrder } from "./components/grid/grid-item/grid-item.types";
 import { IntersectionBehavior } from "./components/intersection/intersection.types";
-import { LayoutBottom, LayoutMain, LayoutTop } from "./components/layout/layout.types";
 import { MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY } from "./components/menu/menu.types";
 import { SpinnerSize, SpinnerType } from "./components/spinner/spinner.types";
 import { StickyState, StickyTop } from "./components/sticky/sticky.types";
 import { ToastPlacement, ToastType } from "./components/toast/toast.types";
+import { TooltipPlacement, TooltipTrigger } from "./components/tooltip/tooltip.types";
 import { TransitionDirection, TransitionDuration, TransitionRepeat } from "./components/transition/transition.types";
-import { SubscribeType } from "./services/tunnel/tunnel.types";
+import { SubscribeType } from "./utils/tunnel/tunnel.types";
 export namespace Components {
     interface PlusAspectRatio {
         /**
           * Specifies the ratio.
          */
         "value"?: AspectRatioValue;
+    }
+    interface PlusBreadcrumb {
+        /**
+          * For localization purposes, you can use the provided translations.
+         */
+        "expanderText"?: string;
+        /**
+          * Specifies Maximum items that is allowed to be displayed.
+         */
+        "max"?: number;
+        /**
+          * The expander button is displayed when the number of the items reached the maximum limit.  The offset property specifies the position of the expander button.
+         */
+        "offset"?: number;
+        /**
+          * You can use HTML elements, Custom separator, or SVG icon.
+         */
+        "separator"?: string;
     }
     interface PlusCard {
         /**
@@ -63,19 +81,23 @@ export namespace Components {
     }
     interface PlusCropper {
         /**
-          * Define the fixed aspect ratio of the viewport. By default, the viewport is free ratio.
+          * A number between 0 and 1. Define the automatic cropping area size.
          */
-        "aspectRatio"?: CropperAspectRatio;
+        "area"?: number;
         /**
-          * Show the black layer above the image and under the viewport.
+          * Defines the initial aspect ratio of the viewport.
+         */
+        "aspectRatio"?: number;
+        /**
+          * Shows the black modal above the image and under the viewport.
          */
         "backdrop"?: boolean;
         /**
-          * Show the grid background of the container.
+          * Shows the grid background of the container.
          */
         "background"?: boolean;
         /**
-          * TODO
+          * Disables the cropper.
          */
         "disabled"?: boolean;
         /**
@@ -87,28 +109,27 @@ export namespace Components {
          */
         "flipY": () => Promise<void>;
         /**
-          * Show the dashed lines above the viewport.
+          * Shows the dashed lines above the viewport.
          */
         "guides"?: boolean;
         /**
-          * Show the center indicator above the viewport.
+          * Shows the center indicator above the viewport.
          */
         "indicator"?: boolean;
         /**
-          * Define the dragging mode of the cropper.
-          * @value crop - create a new viewport.
-          * @value move - move the canvas.
-          * @value none - do nothing.
+          * Defines the cropping mode of the cropper.
+          * @value crop - Creates a new viewport and allows you to move and resize it.
+          * @value move - moves the canvas and viewport.
          */
         "mode"?: CropperMode;
         /**
-          * Move the canvas (image wrapper) with relative offsets.
+          * Move the canvas with relative offsets.
           * @param offsetX - Moving size (px) in the `horizontal` direction. Use `null` to ignore this.
           * @param offsetY - Moving size (px) in the `vertical` direction. Use `null` to ignore this.
          */
         "move": (offsetX?: number, offsetY?: number) => Promise<void>;
         /**
-          * Move the canvas (image wrapper) to an absolute point.
+          * Move the canvas to an absolute point.
           * @param x - The `left` value of the canvas. Use `null` to ignore this.
           * @param y - The `top` value of the canvas. Use `null` to ignore this.
          */
@@ -118,58 +139,55 @@ export namespace Components {
          */
         "reset": () => Promise<void>;
         /**
-          * TODO
-          * @value main - TODO
-          * @value edge - TODO
-          * @value both - TODO
+          * Enables to resize the viewport by dragging (Works when the value of the `mode` property is `crop`).
+          * @value main - Enables to resize the viewport by dragging on the Sides.
+          * @value edge - Enables to resize the viewport by dragging on the vertices.
+          * @value both - Enables to resize the viewport by dragging on the Sides and vertices.
          */
         "resizer"?: CropperResizer;
         /**
-          * TODO
-          * @value square - TODO
-          * @value circle - TODO
-          * @value line   - TODO
+          * Specifies the shape of the resizer.
          */
         "resizerShape"?: CropperResizerShape;
         /**
-          * Re-render the cropper when resizing the window.
-          * @value false - TODO
-          * @value true  - TODO
-          * @value reset - TODO
+          * Re-renders the cropper when resizing the window.
+          * @value reset - Restores the cropped area after resizing the window.
          */
         "responsive"?: CropperResponsive;
         /**
           * Rotate the image with a relative degree.
-          * @param degree - TODO
          */
         "rotate": (degree: number) => Promise<void>;
         /**
           * Rotate the image to an absolute degree.
-          * @param degree - TODO
          */
         "rotateTo": (degree: number) => Promise<void>;
         /**
-          * Image source.
+          * Specifies the shape of the viewport.
+         */
+        "shape"?: CropperShape;
+        /**
+          * Replace the image's src and rebuild the cropper.
          */
         "src"?: string;
         /**
-          * TODO
+          * Gets `base64` from the cropped image.
          */
         "toBase64": () => Promise<string>;
         /**
-          * TODO
+          * Gets `blob` value from the cropped image.
          */
         "toBlob": () => Promise<Blob>;
         /**
-          * TODO
+          * Gets `canvas` from the cropped image.
          */
         "toCanvas": () => Promise<HTMLCanvasElement>;
         /**
-          * TODO
+          * Gets `blob url` from the cropped image.
          */
         "toURL": () => Promise<string>;
         /**
-          * TODO
+          * The previous cropped data if you had stored, will be passed to value automatically when initialized.
          */
         "value"?: CropperValue;
         /**
@@ -181,40 +199,23 @@ export namespace Components {
          */
         "view"?: CropperView;
         /**
-          * TODO
-          * @value static    - TODO
-          * @value movable   - TODO
-          * @value resizable - TODO
-          * @value both      - TODO
-         */
-        "viewport"?: CropperViewport;
-        /**
-          * TODO
-          * @value rectangle - TODO
-          * @value square    - TODO
-          * @value circle    - TODO
-         */
-        "viewportShape"?: CropperViewportShape;
-        /**
-          * Zoom the canvas (image wrapper) with a relative ratio.
-          * @param ratio - TODO
+          * Zoom the canvas with a relative ratio.
          */
         "zoom": (ratio: number) => Promise<void>;
         /**
-          * Define zoom ratio when zooming the image by wheeling mouse.
+          * Defines zoom ratio when zooming the image by wheeling mouse.
          */
         "zoomRatio"?: number;
         /**
-          * Zoom the canvas (image wrapper) to an absolute ratio.
-          * @param ratio - TODO
+          * Zoom the canvas to an absolute ratio.
          */
         "zoomTo": (ratio: number) => Promise<void>;
         /**
-          * Enable to zoom the image.
-          * @value false - Disable zoom.
-          * @value true  - Enable to zoom the image by dragging touch and wheeling mouse.
-          * @value touch - Enable to zoom the image by dragging touch.
-          * @value wheel - Enable to zoom the image by wheeling mouse.
+          * Enables to zoom the image.
+          * @value false - Unable to zoom the image.
+          * @value true  - Enables to zoom the image by touching and wheeling mouse.
+          * @value touch - Enables to zoom the image by touching.
+          * @value wheel - Enables to zoom the image by wheeling mouse.
           * @
          */
         "zoomable"?: CropperZoomable;
@@ -678,20 +679,6 @@ export namespace Components {
          */
         "threshold"?: number | number[];
     }
-    interface PlusLayout {
-        /**
-          * TODO
-         */
-        "bottom"?: LayoutBottom;
-        /**
-          * TODO
-         */
-        "main"?: LayoutMain;
-        /**
-          * TODO
-         */
-        "top"?: LayoutTop;
-    }
     interface PlusMenu {
         /**
           * TODO
@@ -832,7 +819,17 @@ export namespace Components {
          */
         "value"?: string;
     }
+    interface PlusTemplate {
+        /**
+          * TODO
+         */
+        "disabled"?: boolean;
+    }
     interface PlusToast {
+        /**
+          * TODO
+         */
+        "animation"?: string;
         /**
           * TODO
          */
@@ -840,7 +837,15 @@ export namespace Components {
         /**
           * TODO
          */
+        "fullWidth"?: boolean;
+        /**
+          * TODO
+         */
         "open"?: boolean;
+        /**
+          * TODO
+         */
+        "persistent"?: boolean;
         /**
           * TODO
          */
@@ -848,7 +853,29 @@ export namespace Components {
         /**
           * TODO
          */
+        "reverse"?: boolean;
+        /**
+          * TODO
+         */
         "type"?: ToastType;
+    }
+    interface PlusTooltip {
+        /**
+          * Tooltip disable.
+         */
+        "disabled"?: boolean;
+        /**
+          * Add fixed strategy to popper.
+         */
+        "fixed"?: boolean;
+        /**
+          * How to position the tooltip.
+         */
+        "placement"?: TooltipPlacement;
+        /**
+          * How tooltip is triggered, include click, hover, focus.
+         */
+        "trigger"?: TooltipTrigger;
     }
     interface PlusTransition {
         /**
@@ -884,6 +911,12 @@ declare global {
     var HTMLPlusAspectRatioElement: {
         prototype: HTMLPlusAspectRatioElement;
         new (): HTMLPlusAspectRatioElement;
+    };
+    interface HTMLPlusBreadcrumbElement extends Components.PlusBreadcrumb, HTMLStencilElement {
+    }
+    var HTMLPlusBreadcrumbElement: {
+        prototype: HTMLPlusBreadcrumbElement;
+        new (): HTMLPlusBreadcrumbElement;
     };
     interface HTMLPlusCardElement extends Components.PlusCard, HTMLStencilElement {
     }
@@ -993,12 +1026,6 @@ declare global {
         prototype: HTMLPlusIntersectionElement;
         new (): HTMLPlusIntersectionElement;
     };
-    interface HTMLPlusLayoutElement extends Components.PlusLayout, HTMLStencilElement {
-    }
-    var HTMLPlusLayoutElement: {
-        prototype: HTMLPlusLayoutElement;
-        new (): HTMLPlusLayoutElement;
-    };
     interface HTMLPlusMenuElement extends Components.PlusMenu, HTMLStencilElement {
     }
     var HTMLPlusMenuElement: {
@@ -1059,11 +1086,23 @@ declare global {
         prototype: HTMLPlusTabsTabElement;
         new (): HTMLPlusTabsTabElement;
     };
+    interface HTMLPlusTemplateElement extends Components.PlusTemplate, HTMLStencilElement {
+    }
+    var HTMLPlusTemplateElement: {
+        prototype: HTMLPlusTemplateElement;
+        new (): HTMLPlusTemplateElement;
+    };
     interface HTMLPlusToastElement extends Components.PlusToast, HTMLStencilElement {
     }
     var HTMLPlusToastElement: {
         prototype: HTMLPlusToastElement;
         new (): HTMLPlusToastElement;
+    };
+    interface HTMLPlusTooltipElement extends Components.PlusTooltip, HTMLStencilElement {
+    }
+    var HTMLPlusTooltipElement: {
+        prototype: HTMLPlusTooltipElement;
+        new (): HTMLPlusTooltipElement;
     };
     interface HTMLPlusTransitionElement extends Components.PlusTransition, HTMLStencilElement {
     }
@@ -1079,6 +1118,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "plus-aspect-ratio": HTMLPlusAspectRatioElement;
+        "plus-breadcrumb": HTMLPlusBreadcrumbElement;
         "plus-card": HTMLPlusCardElement;
         "plus-card-body": HTMLPlusCardBodyElement;
         "plus-card-footer": HTMLPlusCardFooterElement;
@@ -1097,7 +1137,6 @@ declare global {
         "plus-grid": HTMLPlusGridElement;
         "plus-grid-item": HTMLPlusGridItemElement;
         "plus-intersection": HTMLPlusIntersectionElement;
-        "plus-layout": HTMLPlusLayoutElement;
         "plus-menu": HTMLPlusMenuElement;
         "plus-ripple": HTMLPlusRippleElement;
         "plus-spinner": HTMLPlusSpinnerElement;
@@ -1108,7 +1147,9 @@ declare global {
         "plus-tabs-panel": HTMLPlusTabsPanelElement;
         "plus-tabs-panels": HTMLPlusTabsPanelsElement;
         "plus-tabs-tab": HTMLPlusTabsTabElement;
+        "plus-template": HTMLPlusTemplateElement;
         "plus-toast": HTMLPlusToastElement;
+        "plus-tooltip": HTMLPlusTooltipElement;
         "plus-transition": HTMLPlusTransitionElement;
         "plus-tunnel-consumer": HTMLPlusTunnelConsumerElement;
     }
@@ -1119,6 +1160,24 @@ declare namespace LocalJSX {
           * Specifies the ratio.
          */
         "value"?: AspectRatioValue;
+    }
+    interface PlusBreadcrumb {
+        /**
+          * For localization purposes, you can use the provided translations.
+         */
+        "expanderText"?: string;
+        /**
+          * Specifies Maximum items that is allowed to be displayed.
+         */
+        "max"?: number;
+        /**
+          * The expander button is displayed when the number of the items reached the maximum limit.  The offset property specifies the position of the expander button.
+         */
+        "offset"?: number;
+        /**
+          * You can use HTML elements, Custom separator, or SVG icon.
+         */
+        "separator"?: string;
     }
     interface PlusCard {
         /**
@@ -1160,38 +1219,41 @@ declare namespace LocalJSX {
     }
     interface PlusCropper {
         /**
-          * Define the fixed aspect ratio of the viewport. By default, the viewport is free ratio.
+          * A number between 0 and 1. Define the automatic cropping area size.
          */
-        "aspectRatio"?: CropperAspectRatio;
+        "area"?: number;
         /**
-          * Show the black layer above the image and under the viewport.
+          * Defines the initial aspect ratio of the viewport.
+         */
+        "aspectRatio"?: number;
+        /**
+          * Shows the black modal above the image and under the viewport.
          */
         "backdrop"?: boolean;
         /**
-          * Show the grid background of the container.
+          * Shows the grid background of the container.
          */
         "background"?: boolean;
         /**
-          * TODO
+          * Disables the cropper.
          */
         "disabled"?: boolean;
         /**
-          * Show the dashed lines above the viewport.
+          * Shows the dashed lines above the viewport.
          */
         "guides"?: boolean;
         /**
-          * Show the center indicator above the viewport.
+          * Shows the center indicator above the viewport.
          */
         "indicator"?: boolean;
         /**
-          * Define the dragging mode of the cropper.
-          * @value crop - create a new viewport.
-          * @value move - move the canvas.
-          * @value none - do nothing.
+          * Defines the cropping mode of the cropper.
+          * @value crop - Creates a new viewport and allows you to move and resize it.
+          * @value move - moves the canvas and viewport.
          */
         "mode"?: CropperMode;
         /**
-          * This event fires when the canvas (image wrapper) or the viewport changed.
+          * This event fires when the canvas or the viewport changed.
          */
         "onPlusCrop"?: (event: CustomEvent<void>) => void;
         /**
@@ -1199,36 +1261,35 @@ declare namespace LocalJSX {
          */
         "onPlusReady"?: (event: CustomEvent<void>) => void;
         /**
-          * This event fires when a cropper instance starts to zoom in or zoom out its canvas (image wrapper).
+          * This event fires when a cropper instance starts to zoom in or zoom out its canvas.
          */
         "onPlusZoom"?: (event: CustomEvent<CropperZoomData>) => void;
         /**
-          * TODO
-          * @value main - TODO
-          * @value edge - TODO
-          * @value both - TODO
+          * Enables to resize the viewport by dragging (Works when the value of the `mode` property is `crop`).
+          * @value main - Enables to resize the viewport by dragging on the Sides.
+          * @value edge - Enables to resize the viewport by dragging on the vertices.
+          * @value both - Enables to resize the viewport by dragging on the Sides and vertices.
          */
         "resizer"?: CropperResizer;
         /**
-          * TODO
-          * @value square - TODO
-          * @value circle - TODO
-          * @value line   - TODO
+          * Specifies the shape of the resizer.
          */
         "resizerShape"?: CropperResizerShape;
         /**
-          * Re-render the cropper when resizing the window.
-          * @value false - TODO
-          * @value true  - TODO
-          * @value reset - TODO
+          * Re-renders the cropper when resizing the window.
+          * @value reset - Restores the cropped area after resizing the window.
          */
         "responsive"?: CropperResponsive;
         /**
-          * Image source.
+          * Specifies the shape of the viewport.
+         */
+        "shape"?: CropperShape;
+        /**
+          * Replace the image's src and rebuild the cropper.
          */
         "src"?: string;
         /**
-          * TODO
+          * The previous cropped data if you had stored, will be passed to value automatically when initialized.
          */
         "value"?: CropperValue;
         /**
@@ -1240,30 +1301,15 @@ declare namespace LocalJSX {
          */
         "view"?: CropperView;
         /**
-          * TODO
-          * @value static    - TODO
-          * @value movable   - TODO
-          * @value resizable - TODO
-          * @value both      - TODO
-         */
-        "viewport"?: CropperViewport;
-        /**
-          * TODO
-          * @value rectangle - TODO
-          * @value square    - TODO
-          * @value circle    - TODO
-         */
-        "viewportShape"?: CropperViewportShape;
-        /**
-          * Define zoom ratio when zooming the image by wheeling mouse.
+          * Defines zoom ratio when zooming the image by wheeling mouse.
          */
         "zoomRatio"?: number;
         /**
-          * Enable to zoom the image.
-          * @value false - Disable zoom.
-          * @value true  - Enable to zoom the image by dragging touch and wheeling mouse.
-          * @value touch - Enable to zoom the image by dragging touch.
-          * @value wheel - Enable to zoom the image by wheeling mouse.
+          * Enables to zoom the image.
+          * @value false - Unable to zoom the image.
+          * @value true  - Enables to zoom the image by touching and wheeling mouse.
+          * @value touch - Enables to zoom the image by touching.
+          * @value wheel - Enables to zoom the image by wheeling mouse.
           * @
          */
         "zoomable"?: CropperZoomable;
@@ -1763,20 +1809,6 @@ declare namespace LocalJSX {
          */
         "threshold"?: number | number[];
     }
-    interface PlusLayout {
-        /**
-          * TODO
-         */
-        "bottom"?: LayoutBottom;
-        /**
-          * TODO
-         */
-        "main"?: LayoutMain;
-        /**
-          * TODO
-         */
-        "top"?: LayoutTop;
-    }
     interface PlusMenu {
         /**
           * TODO
@@ -1933,7 +1965,17 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
+    interface PlusTemplate {
+        /**
+          * TODO
+         */
+        "disabled"?: boolean;
+    }
     interface PlusToast {
+        /**
+          * TODO
+         */
+        "animation"?: string;
         /**
           * TODO
          */
@@ -1941,7 +1983,31 @@ declare namespace LocalJSX {
         /**
           * TODO
          */
+        "fullWidth"?: boolean;
+        /**
+          * TODO
+         */
+        "onPlusClose"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusClosed"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusOpen"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
+        "onPlusOpened"?: (event: CustomEvent<void>) => void;
+        /**
+          * TODO
+         */
         "open"?: boolean;
+        /**
+          * TODO
+         */
+        "persistent"?: boolean;
         /**
           * TODO
          */
@@ -1949,7 +2015,29 @@ declare namespace LocalJSX {
         /**
           * TODO
          */
+        "reverse"?: boolean;
+        /**
+          * TODO
+         */
         "type"?: ToastType;
+    }
+    interface PlusTooltip {
+        /**
+          * Tooltip disable.
+         */
+        "disabled"?: boolean;
+        /**
+          * Add fixed strategy to popper.
+         */
+        "fixed"?: boolean;
+        /**
+          * How to position the tooltip.
+         */
+        "placement"?: TooltipPlacement;
+        /**
+          * How tooltip is triggered, include click, hover, focus.
+         */
+        "trigger"?: TooltipTrigger;
     }
     interface PlusTransition {
         /**
@@ -1996,6 +2084,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "plus-aspect-ratio": PlusAspectRatio;
+        "plus-breadcrumb": PlusBreadcrumb;
         "plus-card": PlusCard;
         "plus-card-body": PlusCardBody;
         "plus-card-footer": PlusCardFooter;
@@ -2014,7 +2103,6 @@ declare namespace LocalJSX {
         "plus-grid": PlusGrid;
         "plus-grid-item": PlusGridItem;
         "plus-intersection": PlusIntersection;
-        "plus-layout": PlusLayout;
         "plus-menu": PlusMenu;
         "plus-ripple": PlusRipple;
         "plus-spinner": PlusSpinner;
@@ -2025,7 +2113,9 @@ declare namespace LocalJSX {
         "plus-tabs-panel": PlusTabsPanel;
         "plus-tabs-panels": PlusTabsPanels;
         "plus-tabs-tab": PlusTabsTab;
+        "plus-template": PlusTemplate;
         "plus-toast": PlusToast;
+        "plus-tooltip": PlusTooltip;
         "plus-transition": PlusTransition;
         "plus-tunnel-consumer": PlusTunnelConsumer;
     }
@@ -2035,6 +2125,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "plus-aspect-ratio": LocalJSX.PlusAspectRatio & JSXBase.HTMLAttributes<HTMLPlusAspectRatioElement>;
+            "plus-breadcrumb": LocalJSX.PlusBreadcrumb & JSXBase.HTMLAttributes<HTMLPlusBreadcrumbElement>;
             "plus-card": LocalJSX.PlusCard & JSXBase.HTMLAttributes<HTMLPlusCardElement>;
             "plus-card-body": LocalJSX.PlusCardBody & JSXBase.HTMLAttributes<HTMLPlusCardBodyElement>;
             "plus-card-footer": LocalJSX.PlusCardFooter & JSXBase.HTMLAttributes<HTMLPlusCardFooterElement>;
@@ -2053,7 +2144,6 @@ declare module "@stencil/core" {
             "plus-grid": LocalJSX.PlusGrid & JSXBase.HTMLAttributes<HTMLPlusGridElement>;
             "plus-grid-item": LocalJSX.PlusGridItem & JSXBase.HTMLAttributes<HTMLPlusGridItemElement>;
             "plus-intersection": LocalJSX.PlusIntersection & JSXBase.HTMLAttributes<HTMLPlusIntersectionElement>;
-            "plus-layout": LocalJSX.PlusLayout & JSXBase.HTMLAttributes<HTMLPlusLayoutElement>;
             "plus-menu": LocalJSX.PlusMenu & JSXBase.HTMLAttributes<HTMLPlusMenuElement>;
             "plus-ripple": LocalJSX.PlusRipple & JSXBase.HTMLAttributes<HTMLPlusRippleElement>;
             "plus-spinner": LocalJSX.PlusSpinner & JSXBase.HTMLAttributes<HTMLPlusSpinnerElement>;
@@ -2064,7 +2154,9 @@ declare module "@stencil/core" {
             "plus-tabs-panel": LocalJSX.PlusTabsPanel & JSXBase.HTMLAttributes<HTMLPlusTabsPanelElement>;
             "plus-tabs-panels": LocalJSX.PlusTabsPanels & JSXBase.HTMLAttributes<HTMLPlusTabsPanelsElement>;
             "plus-tabs-tab": LocalJSX.PlusTabsTab & JSXBase.HTMLAttributes<HTMLPlusTabsTabElement>;
+            "plus-template": LocalJSX.PlusTemplate & JSXBase.HTMLAttributes<HTMLPlusTemplateElement>;
             "plus-toast": LocalJSX.PlusToast & JSXBase.HTMLAttributes<HTMLPlusToastElement>;
+            "plus-tooltip": LocalJSX.PlusTooltip & JSXBase.HTMLAttributes<HTMLPlusTooltipElement>;
             "plus-transition": LocalJSX.PlusTransition & JSXBase.HTMLAttributes<HTMLPlusTransitionElement>;
             "plus-tunnel-consumer": LocalJSX.PlusTunnelConsumer & JSXBase.HTMLAttributes<HTMLPlusTunnelConsumerElement>;
         }

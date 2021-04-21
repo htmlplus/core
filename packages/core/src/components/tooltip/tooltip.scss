@@ -1,0 +1,35 @@
+@import 'reset';
+@import 'tooltip.variables';
+
+:host {
+
+  // @prop TODO
+  --plus-tooltip-background-color: #{$tooltip-background-color};
+
+  // @prop TODO
+  --plus-tooltip-border-radius: #{$tooltip-border-radius};
+
+  // @prop TODO
+  --plus-tooltip-color: #{$tooltip-color};
+
+  // @prop TODO
+  --plus-tooltip-padding: #{$tooltip-padding};
+
+  // @prop TODO
+  --plus-tooltip-z-index: #{$tooltip-z-index};
+}
+
+.tooltip {
+  background: var(--plus-tooltip-background-color);
+  color: var(--plus-tooltip-color);
+  padding: var(--plus-tooltip-padding);
+  border-radius: var(--plus-tooltip-border-radius);
+  z-index: var(--plus-tooltip-z-index);
+  display: none;
+  font-weight: bold;
+  position: absolute;
+}
+
+.show {
+  display: inline-block;
+}

@@ -1,25 +1,22 @@
 import { Component, Element, Event, EventEmitter, Host, Method, Prop, h } from '@stencil/core';
 import CropperCore from 'cropperjs';
-import * as Utils from '@app/utils';
-import { Bind, GlobalConfig } from '@app/services';
+import { Bind, GlobalConfig, Helper } from '@app/utils';
 import {
-  CropperAspectRatio,
   CropperValue,
   CropperMode,
   CropperResizer,
   CropperResizerShape,
   CropperResponsive,
+  CropperShape,
   CropperView,
-  CropperViewport,
-  CropperViewportShape,
   CropperZoomable,
   CropperZoomData,
 } from './cropper.types';
 
 /**
- * TODO https://foliotek.github.io/Croppie/
- * @development
- * @examples default, aspect-ratio, backdrop, background, guides, indicator, mode, viewport, viewport-shape
+ * An image cropper is a web & mobile component which enable the user to resize, move, crop 
+ * an area of images before they're uploaded to the server.
+ * @examples default, area, aspect-ratio, backdrop, background, guides, indicator, mode, shape, styles
  */
 @Component({
   tag: 'plus-cropper',
@@ -29,85 +26,91 @@ import {
 export class Cropper {
 
   /**
-   * Define the fixed aspect ratio of the viewport. By default, the viewport is free ratio.
+   * A number between 0 and 1. Define the automatic cropping area size.
    */
   @Prop()
-  aspectRatio?: CropperAspectRatio;
+  area?: number = 0.75;
 
   /**
-   * Show the black layer above the image and under the viewport.
+   * Defines the initial aspect ratio of the viewport.
+   */
+  @Prop()
+  aspectRatio?: number;
+
+  /**
+   * Shows the black modal above the image and under the viewport.
    */
   @Prop()
   backdrop?: boolean = true;
 
   /**
-   * Show the grid background of the container.
+   * Shows the grid background of the container.
    */
   @Prop()
   background?: boolean;
 
   /**
-   * TODO
+   * Disables the cropper.
    */
   @Prop()
   disabled?: boolean;
 
   /**
-   * Show the dashed lines above the viewport.
+   * Shows the dashed lines above the viewport.
    */
   @Prop()
   guides?: boolean;
 
   /**
-   * Show the center indicator above the viewport.
+   * Shows the center indicator above the viewport.
    */
   @Prop()
   indicator?: boolean;
 
   /**
-   * Define the dragging mode of the cropper.
-   * @value crop - create a new viewport.
-   * @value move - move the canvas.
-   * @value none - do nothing.
+   * Defines the cropping mode of the cropper.
+   * @value crop - Creates a new viewport and allows you to move and resize it.
+   * @value move - moves the canvas and viewport.
    */
   @Prop()
   mode?: CropperMode = 'move';
 
   /**
-   * TODO
-   * @value main - TODO
-   * @value edge - TODO
-   * @value both - TODO
+   * Enables to resize the viewport by dragging (Works when the value of the `mode` property is `crop`).
+   * @value main - Enables to resize the viewport by dragging on the Sides.
+   * @value edge - Enables to resize the viewport by dragging on the vertices.
+   * @value both - Enables to resize the viewport by dragging on the Sides and vertices.
    */
   @Prop()
   resizer?: CropperResizer = 'both';
 
   /**
-   * TODO
-   * @value square - TODO
-   * @value circle - TODO
-   * @value line   - TODO
+   * Specifies the shape of the resizer.
    */
   @Prop()
   resizerShape?: CropperResizerShape = 'square';
 
   /**
-   * Re-render the cropper when resizing the window.
-   * @value false - TODO
-   * @value true  - TODO
-   * @value reset - TODO
+   * Re-renders the cropper when resizing the window.
+   * @value reset - Restores the cropped area after resizing the window.
    */
   @Prop()
   responsive?: CropperResponsive = 'reset';
 
   /**
-   * Image source.
+   * Specifies the shape of the viewport.
+   */
+  @Prop()
+  shape?: CropperShape = 'rectangle';
+
+  /**
+   * Replace the image's src and rebuild the cropper.
    */
   @Prop()
   src?: string;
 
   /**
-   * TODO
+   * The previous cropped data if you had stored, will be passed to value automatically when initialized. 
    */
   @Prop({ mutable: true })
   value?: CropperValue;
@@ -131,37 +134,18 @@ export class Cropper {
   view?: CropperView = 'cover';
 
   /**
-   * TODO
-   * @value static    - TODO
-   * @value movable   - TODO
-   * @value resizable - TODO
-   * @value both      - TODO
-   */
-  @Prop()
-  viewport?: CropperViewport = 'static';
-
-  /**
-   * TODO
-   * @value rectangle - TODO
-   * @value square    - TODO
-   * @value circle    - TODO
-   */
-  @Prop()
-  viewportShape?: CropperViewportShape = 'rectangle';
-
-  /**
-   * Enable to zoom the image.
-   * @value false - Disable zoom.
-   * @value true  - Enable to zoom the image by dragging touch and wheeling mouse.
-   * @value touch - Enable to zoom the image by dragging touch.
-   * @value wheel - Enable to zoom the image by wheeling mouse.
+   * Enables to zoom the image.
+   * @value false - Unable to zoom the image.
+   * @value true  - Enables to zoom the image by touching and wheeling mouse.
+   * @value touch - Enables to zoom the image by touching.
+   * @value wheel - Enables to zoom the image by wheeling mouse.
    * @
    */
   @Prop()
   zoomable?: CropperZoomable = true;
 
   /**
-   * Define zoom ratio when zooming the image by wheeling mouse.
+   * Defines zoom ratio when zooming the image by wheeling mouse.
    */
   @Prop()
   zoomRatio?: number = 0.1;
@@ -176,7 +160,7 @@ export class Cropper {
   plusReady!: EventEmitter<void>;
 
   /**
-   * This event fires when the canvas (image wrapper) or the viewport changed.
+   * This event fires when the canvas or the viewport changed.
    */
   @Event({
     bubbles: false,
@@ -185,7 +169,7 @@ export class Cropper {
   plusCrop!: EventEmitter<void>;
 
   /**
-   * This event fires when a cropper instance starts to zoom in or zoom out its canvas (image wrapper).
+   * This event fires when a cropper instance starts to zoom in or zoom out its canvas.
    */
   @Event({
     bubbles: false,
@@ -194,14 +178,14 @@ export class Cropper {
   plusZoom!: EventEmitter<CropperZoomData>;
 
   @GlobalConfig('crop', {
+    area: 0.75,
     backdrop: true,
     mode: 'move',
     resizer: 'both',
     resizerShape: 'square',
     responsive: 'reset',
+    shape: 'rectangle',
     view: 'cover',
-    viewport: 'static',
-    viewportShape: 'rectangle',
     zoomable: true,
     zoomRatio: 0.1,
   })
@@ -214,16 +198,15 @@ export class Cropper {
 
   instance?: CropperCore;
 
-  // TODO
   lock: boolean = false;
 
   get classes() {
-    return Utils.classes(
+    return Helper.classes(
       'wrapper',
       {
-        viewportShape: this.viewportShape,
         resizer: this.resizer,
-        resizerShape: this.resizerShape
+        resizerShape: this.resizerShape,
+        shape: this.shape,
       }
     )
   }
@@ -236,7 +219,7 @@ export class Cropper {
 
       if (typeof this.aspectRatio === 'string') {
 
-        const [valueA, valueB] = this.aspectRatio.split('/').map((item) => parseFloat(item));
+        const [valueA, valueB] = `${this.aspectRatio}`.split('/').map((item) => parseFloat(item));
 
         const value = valueA / (valueB || 1);
 
@@ -250,7 +233,7 @@ export class Cropper {
 
       if (this.responsive === 'reset') return this.responsive;
 
-      return Utils.toBoolean(this.responsive);
+      return Helper.toBoolean(this.responsive);
     })();
 
     const view = (() => ({ none: 0, fit: 1, contain: 2, cover: 3 })[this.view] as any)();
@@ -261,37 +244,39 @@ export class Cropper {
 
       if (['touch', 'wheel'].includes(value)) return value;
 
-      return Utils.toBoolean(this.zoomable);
+      return Helper.toBoolean(this.zoomable);
     })();
 
     return {
-      // TODO
-      // autoCrop        : true,
-      // autoCropArea    : this.autoCropArea,
-      // checkCrossOrigin: true,
-      // checkOrientation: true,
-      // minCanvasWidth  : this.canvasMinWidth,
-      // minCanvasHeight : this.canvasMinHeight,
-      // minCropBoxWidth : this.viewportMinWidth,
-      // minCropBoxHeight: this.viewportMinHeight,
-      // preview         : HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | string,
-      // cropstart       : (e) => console.log('cropstart', e),
-      // cropmove        : (e) => console.log('cropmove', e),
-      // cropend         : (e) => console.log('cropend', e),
-      aspectRatio: this.viewportShape === 'rectangle' ? aspectRatio : 1,
-      background: Utils.toBoolean(this.background),
-      center: Utils.toBoolean(this.indicator),
-      cropBoxMovable: this.viewport === 'movable' || this.viewport === 'both',
-      cropBoxResizable: this.viewport === 'resizable' || this.viewport === 'both',
+      /**
+       * TODO
+       * autoCrop        : true,
+       * checkCrossOrigin: true,
+       * checkOrientation: true,
+       * minCanvasWidth  : this.canvasMinWidth,
+       * minCanvasHeight : this.canvasMinHeight,
+       * minCropBoxWidth : this.viewportMinWidth,
+       * minCropBoxHeight: this.viewportMinHeight,
+       * preview         : HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | string,
+       * cropstart       : (e) => console.log('cropstart', e),
+       * cropmove        : (e) => console.log('cropmove', e),
+       * cropend         : (e) => console.log('cropend', e),
+       */
+      autoCropArea: parseFloat(`${this.area}`),
+      aspectRatio: this.shape === 'rectangle' ? aspectRatio : 1,
+      background: Helper.toBoolean(this.background),
+      center: Helper.toBoolean(this.indicator),
+      cropBoxMovable: this.mode === 'crop',
+      cropBoxResizable: this.mode === 'crop',
       data: this.value,
       dragMode: this.mode,
-      guides: Utils.toBoolean(this.guides),
+      guides: Helper.toBoolean(this.guides),
       highlight: false,
       initialAspectRatio: NaN,
       minContainerWidth: 0,
       minContainerHeight: 0,
-      modal: Utils.toBoolean(this.backdrop),
-      movable: true, // TODO: make auto
+      modal: Helper.toBoolean(this.backdrop),
+      movable: true,
       responsive: !!responsive,
       restore: responsive === 'reset',
       rotatable: true,
@@ -331,7 +316,7 @@ export class Cropper {
   }
 
   /**
-   * Move the canvas (image wrapper) with relative offsets.
+   * Move the canvas with relative offsets.
    * @param offsetX - Moving size (px) in the `horizontal` direction. Use `null` to ignore this.
    * @param offsetY - Moving size (px) in the `vertical` direction. Use `null` to ignore this.
    */
@@ -342,7 +327,7 @@ export class Cropper {
   }
 
   /**
-   * Move the canvas (image wrapper) to an absolute point.
+   * Move the canvas to an absolute point.
    * @param x - The `left` value of the canvas. Use `null` to ignore this.
    * @param y - The `top` value of the canvas. Use `null` to ignore this.
    */
@@ -363,7 +348,6 @@ export class Cropper {
 
   /**
    * Rotate the image with a relative degree.
-   * @param degree - TODO
    */
   @Method()
   rotate(degree: number): Promise<void> {
@@ -373,7 +357,6 @@ export class Cropper {
 
   /**
    * Rotate the image to an absolute degree.
-   * @param degree - TODO
    */
   @Method()
   rotateTo(degree: number): Promise<void> {
@@ -382,7 +365,7 @@ export class Cropper {
   }
 
   /**
-   * TODO
+   * Gets `blob` value from the cropped image.
    */
   @Method()
   toBlob(): Promise<Blob> {
@@ -394,7 +377,7 @@ export class Cropper {
   }
 
   /**
-   * TODO
+   * Gets `canvas` from the cropped image.
    */
   @Method()
   toCanvas(): Promise<HTMLCanvasElement> {
@@ -403,7 +386,7 @@ export class Cropper {
   }
 
   /**
-   * TODO
+   * Gets `base64` from the cropped image.
    */
   @Method()
   toBase64(): Promise<string> {
@@ -414,7 +397,7 @@ export class Cropper {
   }
 
   /**
-   * TODO
+   * Gets `blob url` from the cropped image.
    */
   @Method()
   toURL(): Promise<string> {
@@ -428,8 +411,7 @@ export class Cropper {
   }
 
   /**
-   * Zoom the canvas (image wrapper) with a relative ratio.
-   * @param ratio - TODO
+   * Zoom the canvas with a relative ratio.
    */
   @Method()
   zoom(ratio: number): Promise<void> {
@@ -438,8 +420,7 @@ export class Cropper {
   }
 
   /**
-   * Zoom the canvas (image wrapper) to an absolute ratio.
-   * @param ratio - TODO
+   * Zoom the canvas to an absolute ratio.
    */
   @Method()
   zoomTo(ratio: number): Promise<void> {
@@ -530,18 +511,12 @@ export class Cropper {
     switch (name) {
 
       case 'aspectRatio':
-        if (this.viewportShape !== 'rectangle') break;
+        if (this.shape !== 'rectangle') break;
         this.instance?.setAspectRatio(value);
         break;
 
       case 'disabled':
         value ? this.instance?.disable() : this.instance?.enable();
-        break;
-
-      case 'mode':
-        this.instance?.setDragMode(value);
-        this.instance?.clear();
-        this.instance?.crop();
         break;
 
       case 'src':
@@ -556,9 +531,9 @@ export class Cropper {
       case 'resizerShape':
         break;
 
-      case 'viewportShape':
+      case 'shape':
 
-        const aspectRatio = this.viewportShape === 'rectangle' ? this.options.aspectRatio : 1;
+        const aspectRatio = this.shape === 'rectangle' ? this.options.aspectRatio : 1;
 
         this.instance?.setAspectRatio(aspectRatio);
 
@@ -568,9 +543,9 @@ export class Cropper {
       case 'background':
       case 'guides':
       case 'indicator':
+      case 'mode':
       case 'responsive':
       case 'view':
-      case 'viewport':
       case 'zoomable':
       case 'zoomRatio':
         this.rebind();
@@ -634,6 +609,7 @@ export class Cropper {
   }
 
   render() {
+    console.log(this.options, this.area)
     return (
       <Host>
         <div class={this.classes}>

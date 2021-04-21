@@ -1,11 +1,11 @@
-import { Component, Prop, h } from '@stencil/core';
-import { GlobalConfig } from '@app/services';
+import { Component, Host, Prop, h } from '@stencil/core';
+import { GlobalConfig } from '@app/utils';
 import { GridItemAlignSelf, GridItemColumn, GridItemOffset, GridItemOrder } from './grid-item.types';
 
 /**
  * Use as many hp-grid-items as you want inside a hp-grid to layout your content.
  * @group grid
- * @slot - The default slot
+ * @slot default - The default slot.
  */
 @Component({
   tag: 'plus-grid-item',
@@ -298,7 +298,9 @@ export class GridItem {
 
   render() {
     return (
-      <slot />
-    );
+      <Host>
+        <slot />
+      </Host>
+    )
   }
 }

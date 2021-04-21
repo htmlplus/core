@@ -7,7 +7,7 @@ import { DialogFullscreen, DialogGlobalState, DialogPlacement, DialogSize } from
 /**
  * A dialog is a `conversation` between the system and the user. It is prompted when the system needs input from the user or to give the user urgent information concerning their current workflow.
  * @group dialog
- * @slot - The default slot
+ * @slot - The default slot.
  * @examples default, animation, persistent, placement, size, backdrop, scrollable, specific-scrollable, fullscreen, full-width, full-height, sticky, nesting, prevent
  */
 @Component({
@@ -59,7 +59,10 @@ export class Dialog {
   /**
    * Control dialog to show or not.
    */
-  @Prop({ reflect: true })
+  @Prop({ 
+    mutable: true,
+    reflect: true, 
+  })
   open?: boolean;
 
   /**
@@ -153,6 +156,23 @@ export class Dialog {
     toggle: () => this.tryToggle()
   };
 
+  get attributes() {
+
+    const attributes = {
+      'tabindex': -1
+    }
+
+    if (this.open) {
+      attributes['role'] = 'dialog';
+      attributes['aria-modal'] = 'true';
+    }
+    else {
+      attributes['aria-hidden'] = 'true';
+    }
+
+    return attributes;
+  }
+
   get classes() {
 
     let placement = (this.placement || '');
@@ -200,35 +220,8 @@ export class Dialog {
   }
 
   /**
-   * Methods
+   * Internal Methods
    */
-
-  @Watch('connector')
-  connectorWatcher() {
-    rebind(this);
-  }
-
-  @Watch('open')
-  openWatcher() {
-
-    if (this.open) {
-
-      if (this.isOpen) return;
-
-      this.animation.enter({
-        onEnter: () => this.show()
-      })
-    }
-    else {
-
-      if (!this.isOpen) return;
-
-      this.animation.leave({
-        onLeave: () => this.broadcast(false),
-        onLeaved: () => this.hide(),
-      })
-    }
-  }
 
   broadcast(value) {
     this.link.open = value;
@@ -244,7 +237,6 @@ export class Dialog {
 
   hide() {
 
-    this.resetAttributes();
     this.resetEvents();
     ClickOutside.remove(this.$cell);
     Scrollbar.reset(this);
@@ -261,7 +253,6 @@ export class Dialog {
 
   show() {
 
-    this.setAttributes();
     this.setEvents();
     ClickOutside.add(this.$cell, this.onOutsideClick, false);
     Scrollbar.remove(this);
@@ -324,23 +315,7 @@ export class Dialog {
   }
 
   /**
-   * Attributes
-   */
-
-  setAttributes() {
-    this.$host.removeAttribute('aria-hidden');
-    this.$host.setAttribute('aria-modal', 'true');
-    this.$host.setAttribute('role', 'dialog');
-  }
-
-  resetAttributes() {
-    this.$host.setAttribute('aria-hidden', 'true');
-    this.$host.removeAttribute('aria-modal');
-    this.$host.removeAttribute('role');
-  }
-
-  /**
-   * Events
+   * Internal Methods / Events
    */
 
   setEvents() {
@@ -352,7 +327,7 @@ export class Dialog {
   }
 
   /**
-   * z-index
+   * Internal Methods / z-index
    */
 
   setZIndex() {
@@ -368,6 +343,37 @@ export class Dialog {
 
   resetZIndex() {
     this.$host.style.zIndex = null;
+  }
+
+  /**
+  * Watchers
+  */
+
+  @Watch('connector')
+  connectorWatcher() {
+    rebind(this);
+  }
+
+  @Watch('open')
+  openWatcher() {
+
+    if (this.open) {
+
+      if (this.isOpen) return;
+
+      this.animation.enter({
+        onEnter: () => this.show()
+      })
+    }
+    else {
+
+      if (!this.isOpen) return;
+
+      this.animation.leave({
+        onLeave: () => this.broadcast(false),
+        onLeaved: () => this.hide(),
+      })
+    }
   }
 
   /**
@@ -389,7 +395,7 @@ export class Dialog {
   @Bind
   onOutsideClick() {
 
-    if (!this.isOpen || !this.isCurrent) return;
+    if (!this.isOpen || !this.isCurrent || this.persistent) return;
 
     this.tryToHide();
   }
@@ -398,7 +404,7 @@ export class Dialog {
    * Lifecycles
    */
 
-  connectedCallback() {
+  componentDidLoad() {
 
     this.init();
 
@@ -411,7 +417,7 @@ export class Dialog {
 
   render() {
     return (
-      <Host aria-hidden="true" tabindex="-1">
+      <Host {...this.attributes}>
         {this.backdrop && (<div class="backdrop"><div /></div>)}
         <div class={this.classes}>
           <div class="table">
