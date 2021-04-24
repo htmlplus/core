@@ -1,7 +1,8 @@
 import {Component, Element, Event, EventEmitter, Host, Prop, State, h} from '@stencil/core';
-import {Bind, RectObserver, ClickOutside} from '@app/services';
-import {MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY, MenuTrigger} from './menu.types';
+import {RectObserver, Bind, ClickOutside, GlobalState} from '@app/utils';
+import {MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY, MenuTrigger, MenuGlobalState} from './menu.types';
 import {createPopper} from '@popperjs/core';
+import {MenuLink, Link, rebind} from './menu.link';
 
 /**
  * TODO
@@ -9,7 +10,7 @@ import {createPopper} from '@popperjs/core';
  */
 @Component({
   tag: 'plus-menu',
-  styleUrl: '../menu.scss',
+  styleUrl: './menu.scss',
   shadow: true
 })
 export class Menu {
@@ -86,25 +87,32 @@ export class Menu {
   @State()
   x?: string;
 
-  @State()
   y?: string;
 
   @State()
   instance;
   virtualElement = {getBoundingClientRect: this.generateGetBoundingClientRect()};
 
+  @GlobalState()
+  state: MenuGlobalState = {
+    instances: []
+  }
+
   @Element()
   $host!: HTMLElement;
 
-  $slot!: HTMLElement;
-
-  $activator!: HTMLElement;
-
-  $content!: HTMLElement;
+  $content!: HTMLDivElement;
 
   $parent: HTMLElement = this.$host.parentElement;
 
   observer?: RectObserver;
+
+  isOpen?: boolean;
+
+  @Link({scope: '[connector]'})
+  link: MenuLink = {
+    // toggle: () => this.toggle()
+  }
 
   get reverse() {
     return getComputedStyle(this.$host).getPropertyValue('direction') === 'rtl';
@@ -121,9 +129,22 @@ export class Menu {
     }
   }
 
+  get zIndex() {
+
+    if (this.state.instances.length < 1) return;
+
+    const [instance] = this.state.instances.slice(-2);
+
+    if (!instance) return;
+
+    const zIndex = getComputedStyle(instance.$host).getPropertyValue('z-index');
+
+    return `${parseInt(zIndex) + 1}`;
+  }
+
   bind() {
     ClickOutside.add(this.$host, this.hide)
-    document.addEventListener(this.eventTrigger, this.show)
+    this.$host.addEventListener(this.eventTrigger, this.show)
   }
 
   unbind() {
@@ -131,47 +152,41 @@ export class Menu {
     document.removeEventListener(this.eventTrigger, this.show)
   }
 
+  @Bind
   startPopper() {
-    this.instance = createPopper(this.$parent, this.$host);
+    this.instance = createPopper(this.virtualElement, this.$content);
   }
 
   @Bind
   show(ev) {
-    // let target = ev.target;
-    //
-    // console.log("target", target)
-    // do {
-    //   if (target == this.$parent) {
     console.log("inside")
-    this.virtualElement.getBoundingClientRect= this.generateGetBoundingClientRect(ev.clientX, ev.clientY);
-    this.$host.setAttribute('data-show', '');
+    this.isOpen = true;
+    this.virtualElement.getBoundingClientRect = this.generateGetBoundingClientRect(ev.clientX, ev.clientY);
+    this.$content.setAttribute('data-show', '');
     this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: true}]});
     this.instance.update();
-    //     console.log("inside")
-    //     return;
-    //   }
-    //   target = target.preventNode;
-    // } while (target);
-
-    // console.log("outside")
-    // this.hide();
+    this.$content.style.zIndex = this.zIndex;
   }
 
   @Bind
   hide() {
     console.log("outside")
-    this.$host.removeAttribute('data-show');
+    this.isOpen = false;
+    this.$content.removeAttribute('data-show');
     this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: false}]});
     this.instance.update();
+    this.$content.style.zIndex = null;
   }
 
   generateGetBoundingClientRect(x = 0, y = 0) {
     return () => ({width: 0, height: 0, top: y, right: x, bottom: y, left: x,});
   }
 
-  connectedCallback() {
-    console.log("parent", this.$slot)
-    console.log("$content", this.$content)
+  // toggle() {
+  //   this.isOpen ? this.hide() : this.show();
+  // }
+
+  componentDidLoad() {
     this.startPopper();
     this.bind();
   }
@@ -181,8 +196,10 @@ export class Menu {
 
   render() {
     return (
-      <Host>
-        <slot name="content"/>
+      <Host oncontextmenu="return false;">
+        <div ref={(element) => this.$content = element} class="menu-content">
+          <slot name="content"/>
+        </div>
         <slot/>
       </Host>
     );

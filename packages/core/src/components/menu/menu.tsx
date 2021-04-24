@@ -7,7 +7,7 @@ import { MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY } from './menu.types';
  * @internal
  */
 @Component({
-  tag: 'plus-menu',
+  tag: 'plus-menu-old',
   styleUrl: 'menu.scss',
   shadow: true
 })

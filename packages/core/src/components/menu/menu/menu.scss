@@ -1,0 +1,10 @@
+:host {}
+:host {
+  .menu-content {
+    display: none;
+    z-index: 10;
+  }
+  [data-show] {
+    display: block;
+  }
+}
