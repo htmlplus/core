@@ -1,8 +1,7 @@
-import {Component, Element, Event, EventEmitter, Host, Prop, State, h} from '@stencil/core';
+import {Component, Element, Event, Host, Prop, State, h} from '@stencil/core';
 import {RectObserver, Bind, ClickOutside, GlobalState} from '@app/utils';
-import {MenuAlignX, MenuAlignY, MenuGrowX, MenuGrowY, MenuTrigger, MenuGlobalState} from './menu.types';
+import {MenuTrigger, MenuGlobalState} from './menu.types';
 import {createPopper} from '@popperjs/core';
-import {MenuLink, Link, rebind} from './menu.link';
 
 /**
  * TODO
@@ -14,84 +13,33 @@ import {MenuLink, Link, rebind} from './menu.link';
   shadow: true
 })
 export class Menu {
-
   /**
-   * TODO
-   */
-  @Prop()
-  alignX?: MenuAlignX = 'start';
-
-  /**
-   * TODO
-   */
-  @Prop()
-  alignY?: MenuAlignY = 'bottom';
-
-  /**
-   * TODO
-   */
-  @Prop()
-  fixed?: boolean;
-
-  /**
-   * TODO
-   */
-  @Prop()
-  growX?: MenuGrowX = 'auto';
-
-  /**
-   * TODO
-   */
-  @Prop()
-  growY?: MenuGrowY = 'auto';
-
-  /**
-   * TODO
-   */
-  @Prop()
-  offsetX?: string | number;
-
-  /**
-   * TODO
-   */
-  @Prop()
-  offsetY?: string | number;
-
-  /**
-   * TODO
-   */
-  @Prop({reflect: true})
-  open?: boolean;
-
-  /**
-   * TODO
-   */
-  @Prop()
-  persistent?: boolean;
-
-  /**
-   * TODO
+   * Type of event for show menu
    */
   @Prop()
   trigger?: MenuTrigger = 'right-click';
 
   /**
-   * TODO
+   * Disable show menu
    */
+  @Prop()
+  disabled?: boolean;
+
+
   @Event({
     bubbles: false,
     cancelable: true
   })
-  plusClose!: EventEmitter<void>;
 
   @State()
   x?: string;
 
   y?: string;
 
-  @State()
   instance;
+
   virtualElement = {getBoundingClientRect: this.generateGetBoundingClientRect()};
+
 
   @GlobalState()
   state: MenuGlobalState = {
@@ -103,30 +51,63 @@ export class Menu {
 
   $content!: HTMLDivElement;
 
-  $parent: HTMLElement = this.$host.parentElement;
+  $parent = this.$host.parentElement as HTMLElement;
 
   observer?: RectObserver;
 
   isOpen?: boolean;
 
-  @Link({scope: '[connector]'})
-  link: MenuLink = {
-    // toggle: () => this.toggle()
-  }
+  isCreated?: boolean;
 
   get reverse() {
     return getComputedStyle(this.$host).getPropertyValue('direction') === 'rtl';
   }
 
-  get eventTrigger() {
-    switch (this.trigger) {
-      case 'right-click':
-        return 'contextmenu';
-      case 'left-click':
-        return 'click';
-      default:
-        console.log(new Error());
+  get eventsName() {
+
+    const events = {
+      hide: [],
+      show: [],
     }
+
+    const triggers = [this.trigger].flat(1);
+
+    const mapper = {
+      'right-click': ['contextmenu', 'click'],
+      'left-click': ['click', 'contextmenu'],
+      'hover': ['mouseenter', 'mouseleave'],
+    }
+
+    Object.keys(mapper)
+      .filter((key) => triggers.includes(key as any))
+      .map((key) => {
+        const [show, hide] = mapper[key];
+        events.show.push(show);
+        events.hide.push(hide);
+      });
+
+    return events;
+  }
+
+  get isExist() {
+    return this.state.instances.findIndex(instance => instance === this) >= 0;
+  }
+
+  get isParent() {
+    return this.state.instances.length <= 1;
+  }
+
+  get options(): object {
+    const placement = this.isParent ? 'right-end' : 'auto';
+    return {
+      placement: placement
+    }
+  }
+
+  get target() {
+    if (this.state.instances.length < 1) return this.virtualElement;
+
+    return this.state.instances[this.state.instances.length - 1]?.$content;
   }
 
   get zIndex() {
@@ -137,44 +118,60 @@ export class Menu {
 
     if (!instance) return;
 
-    const zIndex = getComputedStyle(instance.$host).getPropertyValue('z-index');
+    const zIndex = getComputedStyle(instance.$content).getPropertyValue('z-index');
 
     return `${parseInt(zIndex) + 1}`;
   }
 
   bind() {
     ClickOutside.add(this.$host, this.hide)
-    this.$host.addEventListener(this.eventTrigger, this.show)
+    this.eventsName.show.map((eventName) => this.$host.addEventListener(eventName, this.show));
+    this.eventsName.hide.map((eventName) => this.$parent.addEventListener(eventName, this.hide));
   }
 
   unbind() {
     ClickOutside.remove(this.$host)
-    document.removeEventListener(this.eventTrigger, this.show)
-  }
-
-  @Bind
-  startPopper() {
-    this.instance = createPopper(this.virtualElement, this.$content);
+    this.eventsName.show.map((eventName) => this.$host.removeEventListener(eventName, this.show));
+    this.eventsName.hide.map((eventName) => this.$parent.removeEventListener(eventName, this.hide));
   }
 
   @Bind
   show(ev) {
-    console.log("inside")
+    if (!this.isCreated) {
+      this.instance = createPopper(this.target, this.$content, this.options);
+      this.isCreated = true;
+    }
+
     this.isOpen = true;
-    this.virtualElement.getBoundingClientRect = this.generateGetBoundingClientRect(ev.clientX, ev.clientY);
+
     this.$content.setAttribute('data-show', '');
-    this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: true}]});
+
+    if (this.isParent) {
+      this.virtualElement.getBoundingClientRect = this.generateGetBoundingClientRect(ev.clientX, ev.clientY);
+      this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: true}]});
+    }
+
     this.instance.update();
+
+    if (!this.isExist)
+      this.state.instances.push(this);
+
     this.$content.style.zIndex = this.zIndex;
   }
 
   @Bind
   hide() {
-    console.log("outside")
     this.isOpen = false;
+
     this.$content.removeAttribute('data-show');
-    this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: false}]});
-    this.instance.update();
+
+    if (this.isParent) {
+      this.instance.setOptions({modifiers: [{name: 'eventListeners', enabled: false}]});
+      this.instance.update();
+    }
+
+    this.state.instances = this.state.instances.filter((instance) => instance !== this);
+
     this.$content.style.zIndex = null;
   }
 
@@ -182,16 +179,14 @@ export class Menu {
     return () => ({width: 0, height: 0, top: y, right: x, bottom: y, left: x,});
   }
 
-  // toggle() {
-  //   this.isOpen ? this.hide() : this.show();
-  // }
-
   componentDidLoad() {
-    this.startPopper();
+    if (this.disabled) return;
     this.bind();
   }
 
   disconnectedCallback() {
+    this.unbind();
+    this.instance.destroy();
   }
 
   render() {
